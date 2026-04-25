@@ -120,8 +120,9 @@ dmypy.json
 cython_debug/
 
 # ---- Data & models (ML/DL specific) ----
-data/*
-!data/.gitkeep
+data/**
+!data/**/
+!data/**/.gitkeep
 *.csv
 *.tsv
 *.parquet

@@ -52,15 +52,48 @@ Esto permite comparar directamente un enfoque clásico contra uno de Deep Learni
 
 ```
 .
-├── data/              # Datasets (not versioned)
-├── notebooks/         # Notebooks for EDA, training and evaluation
-├── src/               # Reusable source code
-├── models/            # Trained models / checkpoints (not versioned)
-├── reports/           # Final report and figures
-├── pyproject.toml     # Dependencies and project metadata (uv)
-├── uv.lock            # Reproducible lockfile
+├── data/
+│   ├── raw/             # Original, immutable data
+│   ├── interim/         # Intermediate transformations
+│   └── processed/       # Final, model-ready data
+├── notebooks/           # Numbered notebooks (one per report section)
+├── src/                 # Reusable source code (diplo_mod_1 package)
+├── models/              # Trained models / checkpoints (not versioned)
+├── reports/             # Final report and figures
+├── pyproject.toml       # Dependencies and project metadata (uv)
+├── uv.lock              # Reproducible lockfile
 └── README.md
 ```
+
+## Notebooks
+
+Convención de nombres: `NN-seccion-descripcion.ipynb`. El prefijo numérico fija el orden de ejecución (Restart & Run All).
+
+| Notebook | Sección del informe |
+| --- | --- |
+| `notebooks/00-intro-dataset.ipynb` | 3.1 Introducción |
+| `notebooks/01-eda.ipynb` | 3.2 Análisis Exploratorio (EDA) |
+| `notebooks/02-preprocessing.ipynb` | 3.3 Preprocesamiento |
+| `notebooks/03-train-baseline-xgboost.ipynb` | 3.4 Entrenamiento — Modelo de ML clásico |
+| `notebooks/04-train-nn-pytorch.ipynb` | 3.4 Entrenamiento — Red Neuronal |
+| `notebooks/05-evaluation-comparison.ipynb` | 3.5 Evaluación y comparación |
+| `notebooks/06-conclusions.ipynb` | 3.6 Conclusiones |
+
+Para ejecutar todos en orden:
+
+```bash
+uv run jupyter nbconvert --to notebook --execute notebooks/*.ipynb
+```
+
+## Capas de datos
+
+| Carpeta | Contenido | Lectores | Escritores |
+| --- | --- | --- | --- |
+| `data/raw/` | Datos originales, sin tocar (read-only) | 00, 01, 02 | (descarga manual) |
+| `data/interim/` | Resultados intermedios entre notebooks | según corresponda | 02 |
+| `data/processed/` | Splits y features listos para modelar | 03, 04, 05 | 02 |
+
+El contenido de `data/` no se versiona; solo se commitean los `.gitkeep`.
 
 ## Requisitos
 
