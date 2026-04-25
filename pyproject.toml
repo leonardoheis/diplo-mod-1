@@ -1,0 +1,28 @@
+[project]
+name = "diplo-mod-1"
+version = "0.1.0"
+description = "Trabajo Practico Final - Machine Learning & Deep Learning"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "xgboost",
+    "ydata-profiling",
+    "torch",
+    "jupyterlab",
+    "ipykernel",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "pytest",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
