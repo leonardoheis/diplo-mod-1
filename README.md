@@ -95,6 +95,45 @@ uv run jupyter nbconvert --to notebook --execute notebooks/*.ipynb
 
 El contenido de `data/` no se versiona; solo se commitean los `.gitkeep`.
 
+## Calidad y linting
+
+Tooling configurado:
+
+- `ruff` (lint + format) — reglas pyflakes (`F`), incluye notebooks.
+- `mypy` (sobre `src/`) y `nbqa` + `mypy` (sobre `notebooks/`).
+- `nbmake` — ejecuta cada notebook end-to-end como test.
+- `pre-commit` — corre todos los hooks de calidad al commitear:
+  - `ruff-format` y `ruff-check --exit-non-zero-on-fix`
+  - `mypy` (src) y `nbqa-mypy` (notebooks)
+  - higiene basica: trailing-whitespace, end-of-file-fixer, check-yaml, debug-statements
+  - `uv-lock` para mantener `uv.lock` sincronizado con `pyproject.toml`
+  - `gitleaks` para evitar commitear secrets
+- `poethepoet` — task runner: orquesta los chequeos detras de un solo comando.
+
+### Setup (una sola vez por clon)
+
+```bash
+uv sync                       # instala dev deps
+uv run pre-commit install     # registra los git hooks
+```
+
+### Comando único
+
+```bash
+uv run poe check              # lint + typecheck + nbtest en cadena
+```
+
+### Sub-tareas (granulares)
+
+```bash
+uv run poe lint               # ruff check + ruff format --check
+uv run poe fmt                # ruff format (auto-fix)
+uv run poe typecheck          # mypy src + nbqa mypy notebooks
+uv run poe nbtest             # pytest --nbmake notebooks (lento, requiere data/)
+uv run poe precommit          # corre todos los hooks contra todos los archivos
+uv run poe precommit-update   # bump manual de las revs de los hooks
+```
+
 ## Requisitos
 
 - Python 3.10+
