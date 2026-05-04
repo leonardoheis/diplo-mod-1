@@ -12,7 +12,7 @@ dependencies = [
     "seaborn",
     "missingno",
     "xgboost",
-    "ydata-profiling",
+    "fg-data-profiling",
     "torch",
     "jupyterlab",
     "ipykernel",
