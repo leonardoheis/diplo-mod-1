@@ -27,7 +27,7 @@ uv run poe typecheck          # mypy src/ + nbqa mypy notebooks/
 uv run poe nbtest             # pytest --nbmake notebooks/ (slow, needs data/)
 ```
 
-Always run `uv run poe check` after making any change — before committing, and after editing notebooks or source files. Pre-commit hooks enforce the same checks automatically.
+Always run `uv run poe check` after making any change and fix any errors. Do not commit or push — the user handles all commits and pushes explicitly.
 
 ## Project structure
 
