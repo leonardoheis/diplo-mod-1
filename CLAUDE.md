@@ -27,7 +27,7 @@ uv run poe typecheck          # mypy src/ + nbqa mypy notebooks/
 uv run poe nbtest             # pytest --nbmake notebooks/ (slow, needs data/)
 ```
 
-Run `uv run poe check` before committing. Pre-commit hooks enforce the same checks automatically.
+Always run `uv run poe check` after making any change — before committing, and after editing notebooks or source files. Pre-commit hooks enforce the same checks automatically.
 
 ## Project structure
 
@@ -59,6 +59,11 @@ To execute all notebooks end-to-end:
 ```bash
 uv run jupyter nbconvert --to notebook --execute notebooks/*.ipynb
 ```
+
+## Notebook conventions
+
+- **First cell is always an import cell**: all `import` statements go in the very first code cell of each notebook. Never scatter imports across later cells — if a new import is needed, add it to the first cell.
+- Imports are sorted: stdlib → third-party → local, alphabetically within each group (ruff-compatible order).
 
 ## Gotchas
 
