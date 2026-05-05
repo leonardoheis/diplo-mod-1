@@ -48,6 +48,38 @@ Esto permite comparar directamente un enfoque clásico contra uno de Deep Learni
 | [Heart Disease (Cleveland)](https://archive.ics.uci.edu/dataset/45) | Clasificación | 303 | UCI ML Repository |
 | California Housing (`sklearn.datasets.fetch_california_housing`) | Regresión | 20.640 | StatLib / scikit-learn |
 
+## Dataset elegido
+
+**[Wine Reviews](https://www.kaggle.com/datasets/zynicide/wine-reviews/data)** — reseñas de vinos publicadas en WineEnthusiast magazine, scrapeadas por Zack Thoutt (Kaggle).
+
+| Atributo | Valor |
+| --- | --- |
+| Archivo | `winemag-data-130k-v2.csv` |
+| Filas | 129.971 |
+| Columnas | 13 |
+| Tipo de problema | Regresión |
+| Variable objetivo | `points` — puntaje asignado por el catador (80–100) |
+
+### Columnas
+
+| Columna | Tipo | Descripción |
+| --- | --- | --- |
+| `country` | categórica | País de origen del vino |
+| `description` | texto | Reseña escrita por el catador |
+| `designation` | categórica | Sub-etiqueta del viñedo dentro de la bodega |
+| `points` | entero | Puntaje del catador (80–100) — **variable objetivo** |
+| `price` | flotante | Precio en USD |
+| `province` | categórica | Provincia o estado de origen |
+| `region_1` | categórica | Región vitivinícola específica |
+| `region_2` | categórica | Sub-región más específica |
+| `taster_name` | categórica | Nombre del catador de WineEnthusiast |
+| `taster_twitter_handle` | categórica | Handle de Twitter del catador |
+| `title` | texto | Etiqueta completa del vino (incluye año de cosecha) |
+| `variety` | categórica | Variedad de uva (ej. Pinot Noir, Chardonnay) |
+| `winery` | categórica | Nombre de la bodega productora |
+
+> Los otros dos archivos en `data/raw/` (`winemag-data_first150k.csv` y `winemag-data-130k-v2.json`) fueron descartados: el JSON es un espejo exacto del CSV, y el 150k es un scrape independiente con solo el 57% de overlap y sin las columnas de catador.
+
 ## Estructura del repositorio
 
 ```
@@ -153,7 +185,7 @@ uv run python src/script.py
 ## Stack sugerido
 
 - Python 3.10+
-- pandas, numpy, scikit-learn, matplotlib, seaborn, ydata-profiling
+- pandas, numpy, scikit-learn, matplotlib, seaborn, fg-data-profiling
 - XGBoost / LightGBM (modelo clásico)
 - PyTorch (red neuronal, con soporte de GPU Apple Silicon / MPS)
 - Jupyter / JupyterLab
