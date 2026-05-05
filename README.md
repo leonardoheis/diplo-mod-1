@@ -1,86 +1,87 @@
-# Trabajo Práctico Final — Machine Learning & Deep Learning
+# Postgraduate Diploma in AI — Module 1: Machine Learning & Deep Learning
+## Final Project
 
-Trabajo práctico final del módulo de **Machine Learning & Deep Learning** de la diplomatura.
+Final project for the **Machine Learning & Deep Learning** module of the diplomatura program.
 
-## Objetivo
+## Goal
 
-Aplicar las técnicas vistas en la diplomatura a un problema real de datos, recorriendo el ciclo completo:
+Apply the techniques covered in the program to a real dataset, going through the full cycle:
 
-1. Exploración (EDA)
-2. Preprocesamiento
-3. Entrenamiento de modelos
-4. Evaluación crítica de resultados
+1. Exploration (EDA)
+2. Preprocessing
+3. Model training
+4. Critical evaluation of results
 
-## Consigna
+## Assignment
 
 ### Dataset
 
-Utilizar un dataset propio del entorno laboral (recomendado) o uno de los datasets de ejemplo listados más abajo.
+Use a dataset from your own work environment (recommended) or one of the example datasets listed below.
 
-### Modelos a entrenar
+### Models to train
 
-Se entrenarán al menos **dos modelos** sobre el mismo dataset, aplicados al mismo problema:
+At least **two models** must be trained on the same dataset for the same problem:
 
-- **Un modelo de ML clásico**: Regresión Lineal/Logística, Decision Tree, XGBoost, Random Forest, u otro justificado.
-- **Una Red Neuronal**: con TensorFlow o PyTorch.
+- **A classical ML model**: Linear/Logistic Regression, Decision Tree, XGBoost, Random Forest, or another justified choice.
+- **A Neural Network**: with TensorFlow or PyTorch.
 
-Esto permite comparar directamente un enfoque clásico contra uno de Deep Learning.
+This allows a direct comparison between a classical approach and a Deep Learning one.
 
-## Estructura del informe
+## Report structure
 
-1. **Introducción** — Descripción del dataset, variable objetivo y tipo de problema (clasificación o regresión).
-2. **Análisis Exploratorio (EDA)** — Estadísticas descriptivas, visualizaciones, detección de desbalanceo, outliers y datos faltantes.
-3. **Preprocesamiento** — Tratamiento de nulos y outliers, encoding de categóricas, normalización, split train/test, técnicas de balanceo.
-4. **Entrenamiento**
-   - *Modelo de ML*: justificación del algoritmo, hiperparámetros y tuning.
-   - *Red Neuronal*: arquitectura (capas, activaciones), optimizador, epochs, curvas de entrenamiento, regularización (dropout, early stopping, etc.).
-5. **Evaluación y comparación** — Sección clave del trabajo.
-   - Clasificación: accuracy, precision, recall, F1-score, matriz de confusión (obligatoria para ambos modelos), ROC/AUC opcional.
-   - Regresión: MAE, RMSE, R², gráfico de predicciones vs. valores reales.
-   - Análisis crítico: ¿qué modelo performó mejor y por qué?, ¿la red neuronal superó al ML clásico?, ¿hay overfitting?, ¿qué features fueron más relevantes?, ¿qué se mejoraría con más datos/tiempo?
-6. **Conclusiones** — Síntesis de resultados, lecciones aprendidas y trabajo futuro.
+1. **Introduction** — Dataset description, target variable, and problem type (classification or regression).
+2. **Exploratory Data Analysis (EDA)** — Descriptive statistics, visualizations, detection of class imbalance, outliers, and missing values.
+3. **Preprocessing** — Handling nulls and outliers, categorical encoding, normalization, train/test split, balancing techniques.
+4. **Training**
+   - *ML model*: algorithm justification, hyperparameters and tuning.
+   - *Neural Network*: architecture (layers, activations), optimizer, epochs, training curves, regularization (dropout, early stopping, etc.).
+5. **Evaluation and comparison** — Key section of the project.
+   - Classification: accuracy, precision, recall, F1-score, confusion matrix (mandatory for both models), ROC/AUC optional.
+   - Regression: MAE, RMSE, R², predicted vs actual values plot.
+   - Critical analysis: which model performed better and why? Did the neural network outperform classical ML? Is there overfitting? Which features were most relevant? What would improve with more data/time?
+6. **Conclusions** — Summary of results, lessons learned, and future work.
 
-## Datasets de ejemplo
+## Example datasets
 
-| Dataset | Tipo | Registros | Fuente |
+| Dataset | Type | Rows | Source |
 | --- | --- | --- | --- |
-| [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) | Clasificación | 7.043 | IBM / Kaggle |
-| [Heart Disease (Cleveland)](https://archive.ics.uci.edu/dataset/45) | Clasificación | 303 | UCI ML Repository |
-| California Housing (`sklearn.datasets.fetch_california_housing`) | Regresión | 20.640 | StatLib / scikit-learn |
+| [Telco Customer Churn](https://www.kaggle.com/datasets/blastchar/telco-customer-churn) | Classification | 7,043 | IBM / Kaggle |
+| [Heart Disease (Cleveland)](https://archive.ics.uci.edu/dataset/45) | Classification | 303 | UCI ML Repository |
+| California Housing (`sklearn.datasets.fetch_california_housing`) | Regression | 20,640 | StatLib / scikit-learn |
 
-## Dataset elegido
+## Chosen dataset
 
-**[Wine Reviews](https://www.kaggle.com/datasets/zynicide/wine-reviews/data)** — reseñas de vinos publicadas en WineEnthusiast magazine, scrapeadas por Zack Thoutt (Kaggle).
+**[Wine Reviews](https://www.kaggle.com/datasets/zynicide/wine-reviews/data)** — wine reviews published in WineEnthusiast magazine, scraped by Zack Thoutt (Kaggle).
 
-| Atributo | Valor |
+| Attribute | Value |
 | --- | --- |
-| Archivo | `winemag-data-130k-v2.csv` |
-| Filas | 129.971 |
-| Columnas | 13 |
-| Tipo de problema | Regresión |
-| Variable objetivo | `points` — puntaje asignado por el catador (80–100) |
+| File | `winemag-data-130k-v2.csv` |
+| Rows | 129,971 |
+| Columns | 13 |
+| Problem type | Regression |
+| Target variable | `points` — score assigned by the taster (80–100) |
 
-### Columnas
+### Columns
 
-| Columna | Tipo | Descripción |
+| Column | Type | Description |
 | --- | --- | --- |
-| `country` | categórica | País de origen del vino |
-| `description` | texto | Reseña escrita por el catador |
-| `designation` | categórica | Sub-etiqueta del viñedo dentro de la bodega |
-| `points` | entero | Puntaje del catador (80–100) — **variable objetivo** |
-| `price` | flotante | Precio en USD |
-| `province` | categórica | Provincia o estado de origen |
-| `region_1` | categórica | Región vitivinícola específica |
-| `region_2` | categórica | Sub-región más específica |
-| `taster_name` | categórica | Nombre del catador de WineEnthusiast |
-| `taster_twitter_handle` | categórica | Handle de Twitter del catador |
-| `title` | texto | Etiqueta completa del vino (incluye año de cosecha) |
-| `variety` | categórica | Variedad de uva (ej. Pinot Noir, Chardonnay) |
-| `winery` | categórica | Nombre de la bodega productora |
+| `country` | categorical | Country where the wine was produced |
+| `description` | text | Review written by the taster |
+| `designation` | categorical | Vineyard sub-label within the winery |
+| `points` | integer | Taster score (80–100) — **target variable** |
+| `price` | float | Bottle price in USD |
+| `province` | categorical | Province or state of origin |
+| `region_1` | categorical | Specific wine-growing region |
+| `region_2` | categorical | More specific sub-region |
+| `taster_name` | categorical | Name of the WineEnthusiast reviewer |
+| `taster_twitter_handle` | categorical | Twitter handle of the reviewer |
+| `title` | text | Full wine label (includes vintage year) |
+| `variety` | categorical | Grape variety (e.g. Pinot Noir, Chardonnay) |
+| `winery` | categorical | Name of the producing winery |
 
-> Los otros dos archivos en `data/raw/` (`winemag-data_first150k.csv` y `winemag-data-130k-v2.json`) fueron descartados: el JSON es un espejo exacto del CSV, y el 150k es un scrape independiente con solo el 57% de overlap y sin las columnas de catador.
+> The other two files in `data/raw/` (`winemag-data_first150k.csv` and `winemag-data-130k-v2.json`) were discarded: the JSON is an exact mirror of the CSV, and the 150k is an independent scrape with only 57% row overlap and no taster columns.
 
-## Estructura del repositorio
+## Repository structure
 
 ```
 .
@@ -99,93 +100,93 @@ Esto permite comparar directamente un enfoque clásico contra uno de Deep Learni
 
 ## Notebooks
 
-Convención de nombres: `NN-seccion-descripcion.ipynb`. El prefijo numérico fija el orden de ejecución (Restart & Run All).
+Naming convention: `NN-section-description.ipynb`. The numeric prefix sets the execution order (Restart & Run All).
 
-| Notebook | Sección del informe |
+| Notebook | Report section |
 | --- | --- |
-| `notebooks/00-intro-dataset.ipynb` | 3.1 Introducción |
-| `notebooks/01-eda.ipynb` | 3.2 Análisis Exploratorio (EDA) |
-| `notebooks/02-preprocessing.ipynb` | 3.3 Preprocesamiento |
-| `notebooks/03-train-baseline-xgboost.ipynb` | 3.4 Entrenamiento — Modelo de ML clásico |
-| `notebooks/04-train-nn-pytorch.ipynb` | 3.4 Entrenamiento — Red Neuronal |
-| `notebooks/05-evaluation-comparison.ipynb` | 3.5 Evaluación y comparación |
-| `notebooks/06-conclusions.ipynb` | 3.6 Conclusiones |
+| `notebooks/00-intro-dataset.ipynb` | 3.1 Introduction |
+| `notebooks/01-eda.ipynb` | 3.2 Exploratory Data Analysis (EDA) |
+| `notebooks/02-preprocessing.ipynb` | 3.3 Preprocessing |
+| `notebooks/03-train-baseline-xgboost.ipynb` | 3.4 Training — Classical ML model |
+| `notebooks/04-train-nn-pytorch.ipynb` | 3.4 Training — Neural Network |
+| `notebooks/05-evaluation-comparison.ipynb` | 3.5 Evaluation and comparison |
+| `notebooks/06-conclusions.ipynb` | 3.6 Conclusions |
 
-Para ejecutar todos en orden:
+To execute all notebooks in order:
 
 ```bash
 uv run jupyter nbconvert --to notebook --execute notebooks/*.ipynb
 ```
 
-## Capas de datos
+## Data layers
 
-| Carpeta | Contenido | Lectores | Escritores |
+| Folder | Contents | Readers | Writers |
 | --- | --- | --- | --- |
-| `data/raw/` | Datos originales, sin tocar (read-only) | 00, 01, 02 | (descarga manual) |
-| `data/interim/` | Resultados intermedios entre notebooks | según corresponda | 02 |
-| `data/processed/` | Splits y features listos para modelar | 03, 04, 05 | 02 |
+| `data/raw/` | Original, untouched data (read-only) | 00, 01, 02 | (manual download) |
+| `data/interim/` | Intermediate results between notebooks | as needed | 02 |
+| `data/processed/` | Splits and model-ready features | 03, 04, 05 | 02 |
 
-El contenido de `data/` no se versiona; solo se commitean los `.gitkeep`.
+The contents of `data/` are not versioned — only `.gitkeep` files are committed.
 
-## Calidad y linting
+## Quality and linting
 
-Tooling configurado:
+Configured tooling:
 
-- `ruff` (lint + format) — reglas pyflakes (`F`), incluye notebooks.
-- `mypy` (sobre `src/`) y `nbqa` + `mypy` (sobre `notebooks/`).
-- `nbmake` — ejecuta cada notebook end-to-end como test.
-- `pre-commit` — corre todos los hooks de calidad al commitear:
-  - `ruff-format` y `ruff-check --exit-non-zero-on-fix`
-  - `mypy` (src) y `nbqa-mypy` (notebooks)
-  - higiene basica: trailing-whitespace, end-of-file-fixer, check-yaml, debug-statements
-  - `uv-lock` para mantener `uv.lock` sincronizado con `pyproject.toml`
-  - `gitleaks` para evitar commitear secrets
-- `poethepoet` — task runner: orquesta los chequeos detras de un solo comando.
+- `ruff` (lint + format) — pyflakes (`F`) rules, includes notebooks.
+- `mypy` (on `src/`) and `nbqa` + `mypy` (on `notebooks/`).
+- `nbmake` — executes each notebook end-to-end as a test.
+- `pre-commit` — runs all quality hooks on commit:
+  - `ruff-format` and `ruff-check --exit-non-zero-on-fix`
+  - `mypy` (src) and `nbqa-mypy` (notebooks)
+  - Basic hygiene: trailing-whitespace, end-of-file-fixer, check-yaml, debug-statements
+  - `uv-lock` to keep `uv.lock` in sync with `pyproject.toml`
+  - `gitleaks` to prevent committing secrets
+- `poethepoet` — task runner: orchestrates all checks behind a single command.
 
-### Setup (una sola vez por clon)
-
-```bash
-uv sync                       # instala dev deps
-uv run pre-commit install     # registra los git hooks
-```
-
-### Comando único
+### Setup (once per clone)
 
 ```bash
-uv run poe check              # lint + typecheck + nbtest en cadena
+uv sync                       # install dev deps
+uv run pre-commit install     # register git hooks
 ```
 
-### Sub-tareas (granulares)
+### Single command
+
+```bash
+uv run poe check              # lint + typecheck + nbtest in sequence
+```
+
+### Granular tasks
 
 ```bash
 uv run poe lint               # ruff check + ruff format --check
 uv run poe fmt                # ruff format (auto-fix)
 uv run poe typecheck          # mypy src + nbqa mypy notebooks
-uv run poe nbtest             # pytest --nbmake notebooks (lento, requiere data/)
-uv run poe precommit          # corre todos los hooks contra todos los archivos
-uv run poe precommit-update   # bump manual de las revs de los hooks
+uv run poe nbtest             # pytest --nbmake notebooks (slow, requires data/)
+uv run poe precommit          # run all hooks against all files
+uv run poe precommit-update   # manually bump hook revisions
 ```
 
-## Requisitos
+## Requirements
 
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/) — package & project manager
 
 ## Setup
 
-El proyecto usa [`uv`](https://docs.astral.sh/uv/) para manejar dependencias y entorno virtual.
+The project uses [`uv`](https://docs.astral.sh/uv/) to manage dependencies and the virtual environment.
 
 ```bash
-uv sync                       # crea .venv e instala las dependencias del lockfile
-uv add <paquete>              # agregar una nueva dependencia
-uv run jupyter lab            # ejecutar comandos dentro del entorno
+uv sync                       # create .venv and install from lockfile
+uv add <package>              # add a new dependency
+uv run jupyter lab            # run commands inside the environment
 uv run python src/script.py
 ```
 
-## Stack sugerido
+## Stack
 
 - Python 3.10+
 - pandas, numpy, scikit-learn, matplotlib, seaborn, fg-data-profiling
-- XGBoost / LightGBM (modelo clásico)
-- PyTorch (red neuronal, con soporte de GPU Apple Silicon / MPS)
+- XGBoost (classical ML model)
+- PyTorch (neural network, with Apple Silicon / MPS GPU support)
 - Jupyter / JupyterLab
