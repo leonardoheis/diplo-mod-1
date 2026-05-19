@@ -3,8 +3,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: README
+        exclude: ^(reports/|README)
       - id: end-of-file-fixer
+        exclude: ^reports/
       - id: check-yaml
       - id: debug-statements
 
@@ -17,13 +18,16 @@ repos:
     rev: v8.30.0
     hooks:
       - id: gitleaks
+        exclude: ^reports/
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.12
     hooks:
       - id: ruff-format
+        exclude: ^reports/
       - id: ruff-check
         args: [--exit-non-zero-on-fix]
+        exclude: ^reports/
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.19.1
