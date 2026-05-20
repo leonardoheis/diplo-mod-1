@@ -7,10 +7,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from diplo_mod_1.constants import RANDOM_STATE
+from diplo_mod_1.constants import RANDOM_STATE, VINTAGE_RE
 from diplo_mod_1.preprocessing.config import CleaningArtifacts, DataCleanerConfig
-
-_VINTAGE_RE = re.compile(r"\b(19|20)\d{2}\b")
 
 
 class DataCleaner:
@@ -48,7 +46,7 @@ class DataCleaner:
         out = df.copy()
         out = out.drop(columns=["region_2", "taster_twitter_handle"], errors="ignore")
 
-        years = out["title"].astype(str).str.extract(_VINTAGE_RE, expand=False)
+        years = out["title"].astype(str).str.extract(VINTAGE_RE, expand=False)
         vintage_year = pd.to_numeric(years, errors="coerce")
         out["vintage_year"] = vintage_year
         out["vintage_missing"] = vintage_year.isna().astype(int)

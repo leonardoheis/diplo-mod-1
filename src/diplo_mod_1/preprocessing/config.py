@@ -8,7 +8,7 @@ from diplo_mod_1.constants import LUXURY_THRESHOLD, RANDOM_STATE, REF_YEAR
 
 
 class DataCleanerConfig(BaseModel):
-    """Hyperparameters for DataCleaner."""
+    """Hyperparameters for DataCleaner. Reserved for future cleaning hyperparameters."""
 
 
 class FeatureEngineerConfig(BaseModel):
@@ -115,3 +115,11 @@ class CleaningArtifacts(BaseModel):
 
     global_price_median: float
     random_state: int = RANDOM_STATE
+
+
+class FeatureEngineerArtifacts(BaseModel):
+    """Fitted values produced by FeatureEngineer.fit() — serialisable to JSON."""
+
+    luxury_threshold: float
+    ref_year: int
+    median_vintage: float

@@ -19,6 +19,12 @@ from diplo_mod_1.preprocessing.splitter import DataSplitter
 from diplo_mod_1.schemas.pipeline import PreprocessingResult
 
 
+class _SplitResult(NamedTuple):
+    split_idx: dict[str, np.ndarray]
+    splits: dict[str, pd.DataFrame]
+    y_splits: dict[str, np.ndarray]
+
+
 class _XGBoostDataset(NamedTuple):
     X_splits: dict[str, np.ndarray]
     feature_names: list[str]
@@ -78,15 +84,14 @@ class PreprocessingPipeline:
         (interim_dir / "preprocessing_config.json").write_text(
             self.cleaner.artifacts.model_dump_json(indent=2), encoding="utf-8"
         )
+        (interim_dir / "feature_engineer_config.json").write_text(
+            self.feature_engineer.artifacts.model_dump_json(indent=2), encoding="utf-8"
+        )
         featured = self.feature_engineer.transform(cleaned)
         featured.to_parquet(interim_dir / "02_features.parquet")
         return featured
 
-    def _split(
-        self,
-        featured: pd.DataFrame,
-        processed_dir: Path,
-    ) -> tuple[dict[str, np.ndarray], dict[str, pd.DataFrame], dict[str, np.ndarray]]:
+    def _split(self, featured: pd.DataFrame, processed_dir: Path) -> _SplitResult:
         """Stratified split; persist index arrays; return indices, frames, labels."""
         split_idx = self.splitter.split(featured)
         np.savez(
@@ -100,7 +105,7 @@ class PreprocessingPipeline:
             key: featured.iloc[idx]["points"].to_numpy(dtype=np.float32)
             for key, idx in split_idx.items()
         }
-        return split_idx, splits, y_splits
+        return _SplitResult(split_idx=split_idx, splits=splits, y_splits=y_splits)
 
     def _build_xgboost_dataset(
         self,
@@ -166,9 +171,9 @@ class PreprocessingPipeline:
         processed_dir.mkdir(parents=True, exist_ok=True)
 
         featured = self._clean_and_feature(raw_csv, interim_dir)
-        split_idx, splits, y_splits = self._split(featured, processed_dir)
-        xgb = self._build_xgboost_dataset(splits, y_splits, processed_dir)
-        nn = self._build_nn_dataset(splits, y_splits, processed_dir)
+        split = self._split(featured, processed_dir)
+        xgb = self._build_xgboost_dataset(split.splits, split.y_splits, processed_dir)
+        nn = self._build_nn_dataset(split.splits, split.y_splits, processed_dir)
 
         self.exporter.write_manifest(
             processed_dir / "dataset_manifest.json",
@@ -185,5 +190,5 @@ class PreprocessingPipeline:
             xgb_features=len(xgb.feature_names),
             nn_tab_features=len(nn.feature_names),
             txt_features=nn.X_txt_splits["train"].shape[1],
-            split_sizes={k: len(v) for k, v in split_idx.items()},
+            split_sizes={k: len(v) for k, v in split.split_idx.items()},
         )

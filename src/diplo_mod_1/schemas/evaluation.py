@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from diplo_mod_1.domain.metrics import ModelMetrics
 
@@ -22,7 +22,7 @@ class EvaluationResult(BaseModel):
         best = result.best(split="test")
     """
 
-    metrics: list[ModelMetrics] = []
+    metrics: list[ModelMetrics] = Field(default_factory=list)
 
     def add(self, m: ModelMetrics) -> None:
         """Append a metrics record."""
