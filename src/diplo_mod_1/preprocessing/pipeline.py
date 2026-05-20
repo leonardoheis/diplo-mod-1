@@ -14,6 +14,7 @@ from diplo_mod_1.preprocessing.cleaner import DataCleaner
 from diplo_mod_1.preprocessing.config import PipelineConfig
 from diplo_mod_1.preprocessing.encoders import TabularEncoder, TextEncoder
 from diplo_mod_1.preprocessing.exporter import DatasetExporter
+from diplo_mod_1.preprocessing.feature_engineer import FeatureEngineer
 from diplo_mod_1.preprocessing.splitter import DataSplitter
 from diplo_mod_1.schemas.pipeline import PreprocessingResult
 
@@ -54,6 +55,7 @@ class PreprocessingPipeline:
     def __init__(self, config: PipelineConfig | None = None) -> None:
         self.config = config or PipelineConfig()
         self.cleaner = DataCleaner(self.config.cleaner)
+        self.feature_engineer = FeatureEngineer(self.config.feature_engineer)
         self.splitter = DataSplitter(self.config.splitter)
         self.encoder = TabularEncoder(self.config.encoder)
         self.text_encoder = TextEncoder(self.config.text_encoder)
@@ -67,15 +69,16 @@ class PreprocessingPipeline:
     # ── private stages ────────────────────────────────────────────────────────
 
     def _clean_and_feature(self, raw_csv: Path, interim_dir: Path) -> pd.DataFrame:
-        """Load raw CSV, clean, engineer base features; persist interim files."""
+        """Load raw CSV, clean, engineer features; persist interim files."""
         df = DataCleaner.load(raw_csv)
         self.cleaner.fit(df)
+        self.feature_engineer.fit(df)
         cleaned = self.cleaner.clean(df)
         cleaned.to_parquet(interim_dir / "01_cleaned.parquet")
         (interim_dir / "preprocessing_config.json").write_text(
             self.cleaner.artifacts.model_dump_json(indent=2), encoding="utf-8"
         )
-        featured = self.cleaner.add_features(cleaned)
+        featured = self.feature_engineer.transform(cleaned)
         featured.to_parquet(interim_dir / "02_features.parquet")
         return featured
 

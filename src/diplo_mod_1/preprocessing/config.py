@@ -10,6 +10,10 @@ from diplo_mod_1.constants import LUXURY_THRESHOLD, RANDOM_STATE, REF_YEAR
 class DataCleanerConfig(BaseModel):
     """Hyperparameters for DataCleaner."""
 
+
+class FeatureEngineerConfig(BaseModel):
+    """Hyperparameters for FeatureEngineer."""
+
     luxury_threshold: float = LUXURY_THRESHOLD
     ref_year: int = REF_YEAR
 
@@ -100,18 +104,14 @@ class PipelineConfig(BaseModel):
     """
 
     cleaner: DataCleanerConfig = Field(default_factory=DataCleanerConfig)
+    feature_engineer: FeatureEngineerConfig = Field(default_factory=FeatureEngineerConfig)
     splitter: DataSplitterConfig = Field(default_factory=DataSplitterConfig)
     encoder: TabularEncoderConfig = Field(default_factory=TabularEncoderConfig)
     text_encoder: TextEncoderConfig = Field(default_factory=TextEncoderConfig)
 
 
 class CleaningArtifacts(BaseModel):
-    """Fitted values produced by DataCleaner.fit() — serialisable to JSON.
+    """Fitted values produced by DataCleaner.fit() — serialisable to JSON."""
 
-    Replaces the old ``dict[str, Any]`` returned by ``cleaner.config``.
-    """
-
-    luxury_threshold: float
-    ref_year: int
     global_price_median: float
     random_state: int = RANDOM_STATE

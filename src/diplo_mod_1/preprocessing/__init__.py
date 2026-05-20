@@ -14,12 +14,14 @@ from diplo_mod_1.preprocessing.config import (
     CleaningArtifacts,
     DataCleanerConfig,
     DataSplitterConfig,
+    FeatureEngineerConfig,
     PipelineConfig,
     TabularEncoderConfig,
     TextEncoderConfig,
 )
 from diplo_mod_1.preprocessing.encoders import FeatureMatrix, TabularEncoder, TextEncoder
 from diplo_mod_1.preprocessing.exporter import DatasetExporter
+from diplo_mod_1.preprocessing.feature_engineer import FeatureEngineer
 from diplo_mod_1.preprocessing.pipeline import PreprocessingPipeline
 from diplo_mod_1.preprocessing.splitter import DataSplitter
 
@@ -28,13 +30,15 @@ __all__ = [
     "CleaningArtifacts",
     "DataCleaner",
     "DataCleanerConfig",
-    "FeatureMatrix",
     "DataSplitter",
     "DataSplitterConfig",
     "DatasetExporter",
     "DIRECT_CONTINUOUS",
     "FREQ_COLS",
     "FREQ_FEATURE_COLS",
+    "FeatureEngineer",
+    "FeatureEngineerConfig",
+    "FeatureMatrix",
     "OHE_COLS",
     "PipelineConfig",
     "PreprocessingPipeline",
