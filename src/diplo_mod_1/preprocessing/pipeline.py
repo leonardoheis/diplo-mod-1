@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -10,6 +9,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 from diplo_mod_1.preprocessing.cleaner import DataCleaner
+from diplo_mod_1.preprocessing.config import PipelineConfig
 from diplo_mod_1.preprocessing.encoders import TabularEncoder, TextEncoder
 from diplo_mod_1.preprocessing.exporter import DatasetExporter
 from diplo_mod_1.preprocessing.splitter import DataSplitter
@@ -18,29 +18,35 @@ from diplo_mod_1.preprocessing.splitter import DataSplitter
 class PreprocessingPipeline:
     """Orchestrates the full preprocessing run end-to-end.
 
-    Composes DataCleaner, DataSplitter, TabularEncoder, TextEncoder, and
-    DatasetExporter into a single callable.  Each component can be replaced
-    at construction time for experimentation or testing.
+    All hyperparameters are controlled through a single ``PipelineConfig``
+    object, which can be constructed from a JSON file for reproducible runs.
 
     Usage::
 
+        # default config
         pipeline = PreprocessingPipeline()
         summary = pipeline.run(raw_csv, interim_dir, processed_dir)
+
+        # custom config
+        config = PipelineConfig(text_encoder=TextEncoderConfig(max_features=5000))
+        pipeline = PreprocessingPipeline(config)
+
+        # load config from file
+        pipeline = PreprocessingPipeline.from_json(Path("config.json"))
     """
 
-    def __init__(
-        self,
-        cleaner: DataCleaner | None = None,
-        splitter: DataSplitter | None = None,
-        encoder: TabularEncoder | None = None,
-        text_encoder: TextEncoder | None = None,
-        exporter: DatasetExporter | None = None,
-    ) -> None:
-        self.cleaner = cleaner or DataCleaner()
-        self.splitter = splitter or DataSplitter()
-        self.encoder = encoder or TabularEncoder()
-        self.text_encoder = text_encoder or TextEncoder()
-        self.exporter = exporter or DatasetExporter()
+    def __init__(self, config: PipelineConfig | None = None) -> None:
+        self.config = config or PipelineConfig()
+        self.cleaner = DataCleaner(self.config.cleaner)
+        self.splitter = DataSplitter(self.config.splitter)
+        self.encoder = TabularEncoder(self.config.encoder)
+        self.text_encoder = TextEncoder(self.config.text_encoder)
+        self.exporter = DatasetExporter()
+
+    @classmethod
+    def from_json(cls, path: Path) -> "PreprocessingPipeline":
+        """Load pipeline config from a JSON file."""
+        return cls(PipelineConfig.model_validate_json(path.read_text(encoding="utf-8")))
 
     def run(
         self,
@@ -56,7 +62,7 @@ class PreprocessingPipeline:
         cleaned = self.cleaner.clean(df)
         cleaned.to_parquet(interim_dir / "01_cleaned.parquet")
         (interim_dir / "preprocessing_config.json").write_text(
-            json.dumps(self.cleaner.config, indent=2), encoding="utf-8"
+            self.cleaner.artifacts.model_dump_json(indent=2), encoding="utf-8"
         )
         featured = self.cleaner.add_features(cleaned)
         featured.to_parquet(interim_dir / "02_features.parquet")
