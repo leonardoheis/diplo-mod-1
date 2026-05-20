@@ -7,7 +7,8 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from diplo_mod_1.constants import POINTS_BINS
-from diplo_mod_1.preprocessing.config import DataSplitterConfig
+
+from .config import DataSplitterConfig
 
 
 class DataSplitter:

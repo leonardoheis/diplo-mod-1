@@ -18,7 +18,7 @@ from diplo_mod_1.preprocessing.config import (
     TabularEncoderConfig,
     TextEncoderConfig,
 )
-from diplo_mod_1.preprocessing.encoders import TabularEncoder, TextEncoder
+from diplo_mod_1.preprocessing.encoders import FeatureMatrix, TabularEncoder, TextEncoder
 from diplo_mod_1.preprocessing.exporter import DatasetExporter
 from diplo_mod_1.preprocessing.pipeline import PreprocessingPipeline
 from diplo_mod_1.preprocessing.splitter import DataSplitter
@@ -28,6 +28,7 @@ __all__ = [
     "CleaningArtifacts",
     "DataCleaner",
     "DataCleanerConfig",
+    "FeatureMatrix",
     "DataSplitter",
     "DataSplitterConfig",
     "DatasetExporter",

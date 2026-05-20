@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 import numpy as np
 import pandas as pd
 from scipy import sparse
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import OneHotEncoder, TargetEncoder
 
-from diplo_mod_1.preprocessing.columns import (
+from .columns import (
     BINARY_COLS,
     DIRECT_CONTINUOUS,
     FREQ_COLS,
@@ -17,7 +19,19 @@ from diplo_mod_1.preprocessing.columns import (
     TARGET_ENCODE_COLS,
     TARGET_FEATURE_COLS,
 )
-from diplo_mod_1.preprocessing.config import TabularEncoderConfig, TextEncoderConfig
+from .config import TabularEncoderConfig, TextEncoderConfig
+
+
+class FeatureMatrix(NamedTuple):
+    """Named result of a tabular encoding step.
+
+    Supports both attribute access (``result.X``) and positional unpacking
+    (``x, names, groups = encoder.fit_transform(...)``).
+    """
+
+    X: np.ndarray
+    feature_names: list[str]
+    column_groups: dict[str, list[int]]
 
 
 def _assemble_matrix(
@@ -27,56 +41,54 @@ def _assemble_matrix(
     ohe_arr: np.ndarray,
     ohe_names: list[str],
     *,
-    include_strictness: bool = False,
     taster_strictness: np.ndarray | None = None,
-) -> tuple[np.ndarray, list[str], dict[str, list[int]]]:
+) -> FeatureMatrix:
     blocks: list[np.ndarray] = []
     names: list[str] = []
+    continuous_idx: list[int] = []
+    binary_idx: list[int] = []
+    ohe_idx: list[int] = []
+    cursor = 0
 
-    blocks.append(df[DIRECT_CONTINUOUS].to_numpy(dtype=np.float32))
+    block = df[DIRECT_CONTINUOUS].to_numpy(dtype=np.float32)
+    blocks.append(block)
     names.extend(DIRECT_CONTINUOUS)
+    continuous_idx.extend(range(cursor, cursor + block.shape[1]))
+    cursor += block.shape[1]
 
-    blocks.append(df[BINARY_COLS].to_numpy(dtype=np.float32))
+    block = df[BINARY_COLS].to_numpy(dtype=np.float32)
+    blocks.append(block)
     names.extend(BINARY_COLS)
+    binary_idx.extend(range(cursor, cursor + block.shape[1]))
+    cursor += block.shape[1]
 
-    blocks.append(target_df[TARGET_FEATURE_COLS].to_numpy(dtype=np.float32))
+    block = target_df[TARGET_FEATURE_COLS].to_numpy(dtype=np.float32)
+    blocks.append(block)
     names.extend(TARGET_FEATURE_COLS)
+    continuous_idx.extend(range(cursor, cursor + block.shape[1]))
+    cursor += block.shape[1]
 
-    if include_strictness and taster_strictness is not None:
+    if taster_strictness is not None:
         blocks.append(taster_strictness.reshape(-1, 1).astype(np.float32))
         names.append("taster_strictness")
+        continuous_idx.append(cursor)
+        cursor += 1
 
-    blocks.append(freq_df[FREQ_FEATURE_COLS].to_numpy(dtype=np.float32))
+    block = freq_df[FREQ_FEATURE_COLS].to_numpy(dtype=np.float32)
+    blocks.append(block)
     names.extend(FREQ_FEATURE_COLS)
+    continuous_idx.extend(range(cursor, cursor + block.shape[1]))
+    cursor += block.shape[1]
 
     blocks.append(ohe_arr.astype(np.float32))
     names.extend(ohe_names)
+    ohe_idx.extend(range(cursor, cursor + ohe_arr.shape[1]))
 
-    x = np.hstack(blocks).astype(np.float32)
-
-    n_cont = len(DIRECT_CONTINUOUS)
-    n_bin = len(BINARY_COLS)
-    n_target = len(TARGET_FEATURE_COLS)
-    n_strict = 1 if include_strictness else 0
-    n_freq = len(FREQ_FEATURE_COLS)
-
-    # Column layout:
-    #   [0 .. n_cont-1]               → DIRECT_CONTINUOUS
-    #   [n_cont .. +n_bin-1]          → BINARY_COLS        (do NOT scale)
-    #   [n_cont+n_bin .. +n_target-1] → TARGET_FEATURE_COLS
-    #   [... +n_strict]               → taster_strictness (optional)
-    #   [... +n_freq-1]               → FREQ_FEATURE_COLS
-    #   rest                          → OHE
-    binary_start = n_cont
-    target_start = binary_start + n_bin
-    ohe_start = target_start + n_target + n_strict + n_freq
-
-    groups: dict[str, list[int]] = {
-        "continuous": list(range(0, n_cont)) + list(range(target_start, ohe_start)),
-        "binary": list(range(binary_start, binary_start + n_bin)),
-        "ohe": list(range(ohe_start, len(names))),
-    }
-    return x, names, groups
+    return FeatureMatrix(
+        X=np.hstack(blocks).astype(np.float32),
+        feature_names=names,
+        column_groups={"continuous": continuous_idx, "binary": binary_idx, "ohe": ohe_idx},
+    )
 
 
 class TabularEncoder:
@@ -90,9 +102,9 @@ class TabularEncoder:
     Usage::
 
         encoder = TabularEncoder()
-        x_train, names, groups = encoder.fit_transform(train_df, y_train)
-        x_val,   _, _ = encoder.transform(val_df)
-        x_test,  _, _ = encoder.transform(test_df)
+        result = encoder.fit_transform(train_df, y_train)
+        x_train, names, groups = result          # positional unpacking still works
+        x_val = encoder.transform(val_df).X      # or named access
     """
 
     def __init__(self, config: TabularEncoderConfig | None = None) -> None:
@@ -161,7 +173,7 @@ class TabularEncoder:
         y_train: np.ndarray,
         *,
         include_strictness: bool = False,
-    ) -> tuple[np.ndarray, list[str], dict[str, list[int]]]:
+    ) -> FeatureMatrix:
         """Fit and return CV-encoded feature matrix for the training split."""
         train_target_df = self._fit_core(train_df, y_train)
         freq_df = self._encode_freq(train_df)
@@ -177,7 +189,6 @@ class TabularEncoder:
             freq_df,
             ohe_arr,
             ohe_names,
-            include_strictness=include_strictness,
             taster_strictness=taster_strictness,
         )
 
@@ -186,7 +197,7 @@ class TabularEncoder:
         df: pd.DataFrame,
         *,
         include_strictness: bool = False,
-    ) -> tuple[np.ndarray, list[str], dict[str, list[int]]]:
+    ) -> FeatureMatrix:
         """Apply fitted encoders to any split (val, test, or non-CV train)."""
         if not self.target_encoders_:
             raise RuntimeError("Call fit() or fit_transform() before transform().")
@@ -202,7 +213,6 @@ class TabularEncoder:
             freq_df,
             ohe_arr,
             ohe_names,
-            include_strictness=include_strictness,
             taster_strictness=taster_strictness,
         )
 
