@@ -1,4 +1,4 @@
-# CLAUDE.md — diplo-mod-1
+# AGENTS.md — diplo-mod-1
 
 Final project for the Machine Learning & Deep Learning module of a diplomatura program.
 The goal is a full ML pipeline: EDA → preprocessing → classical ML + neural net → evaluation/comparison.
