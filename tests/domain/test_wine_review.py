@@ -1,7 +1,5 @@
 """Tests for WineReview domain model."""
 
-from __future__ import annotations
-
 import pytest
 from pydantic import ValidationError
 

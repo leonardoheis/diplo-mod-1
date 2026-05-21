@@ -1,7 +1,5 @@
 """End-to-end preprocessing pipeline."""
 
-from __future__ import annotations
-
 from pathlib import Path
 from typing import NamedTuple
 

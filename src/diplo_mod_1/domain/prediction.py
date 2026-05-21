@@ -1,7 +1,5 @@
 """WinePrediction — a single model prediction for a wine's quality score."""
 
-from __future__ import annotations
-
 from typing import Literal
 
 from pydantic import Field

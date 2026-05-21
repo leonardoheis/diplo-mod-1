@@ -1,7 +1,5 @@
 """Disk I/O: persist processed datasets, fitted artifacts, and manifest."""
 
-from __future__ import annotations
-
 import json
 from pathlib import Path
 

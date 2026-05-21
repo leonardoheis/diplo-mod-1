@@ -1,7 +1,5 @@
 """WineScorePredictor — structural contract for any trained scoring model."""
 
-from __future__ import annotations
-
 from typing import Protocol, runtime_checkable
 
 from typing_extensions import Self

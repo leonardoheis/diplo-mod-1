@@ -1,7 +1,5 @@
 """FeatureEngineer — derives new columns from a cleaned Wine Reviews DataFrame."""
 
-from __future__ import annotations
-
 import numpy as np
 import pandas as pd
 

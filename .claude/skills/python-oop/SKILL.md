@@ -106,3 +106,9 @@ class DataCleaner:
 ```
 
 Single-line comments only for non-obvious WHY; no block comments explaining what the code does.
+
+---
+
+## Imports
+
+- **Never** add `from __future__ import annotations` — only include it when a forward reference cannot be resolved with a quoted string literal or by reordering definitions.

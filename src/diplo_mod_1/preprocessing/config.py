@@ -1,7 +1,5 @@
 """Pydantic v2 configuration and artifact models for the preprocessing pipeline."""
 
-from __future__ import annotations
-
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from diplo_mod_1.constants import (

@@ -1,7 +1,5 @@
 """Data loading and cleaning for the Wine Reviews dataset."""
 
-from __future__ import annotations
-
 from pathlib import Path
 
 import pandas as pd

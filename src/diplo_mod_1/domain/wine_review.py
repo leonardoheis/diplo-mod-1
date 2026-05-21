@@ -1,7 +1,5 @@
 """WineReview — validated representation of a single raw wine review."""
 
-from __future__ import annotations
-
 from pydantic import Field
 
 from diplo_mod_1.constants import POINTS_MAX, POINTS_MIN

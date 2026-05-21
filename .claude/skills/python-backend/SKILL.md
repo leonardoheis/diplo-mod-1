@@ -22,6 +22,7 @@ Run after every change.
 - **Never** type as `Any`, `dict`, or `tuple` — use concrete types or named models
 - `| None` (Optional) only when genuinely necessary
 - Fail fast and close to the root cause
+- **Never** add `from __future__ import annotations` — only include it when a forward reference cannot be resolved with a quoted string literal or by reordering definitions
 
 ## Layer Architecture
 

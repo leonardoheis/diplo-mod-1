@@ -1,7 +1,5 @@
 """Preprocessing-layer fixtures derived from the root small_raw_df."""
 
-from __future__ import annotations
-
 import pandas as pd
 import pytest
 

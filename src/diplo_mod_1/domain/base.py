@@ -1,7 +1,5 @@
 """Shared base for all domain value objects."""
 
-from __future__ import annotations
-
 from pydantic import BaseModel, ConfigDict
 
 

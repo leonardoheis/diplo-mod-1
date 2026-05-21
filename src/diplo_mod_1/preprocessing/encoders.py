@@ -1,7 +1,5 @@
 """Tabular and text feature encoders for the Wine Reviews pipeline."""
 
-from __future__ import annotations
-
 from typing import NamedTuple
 
 import numpy as np

@@ -1,7 +1,5 @@
 """Tests for Pydantic config models and their validators."""
 
-from __future__ import annotations
-
 import pytest
 from pydantic import ValidationError
 
