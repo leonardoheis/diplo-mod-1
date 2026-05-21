@@ -23,7 +23,6 @@ YEAR_MAX = 2100
 TEST_SIZE = 0.2
 VAL_SIZE = 0.2
 TARGET_ENCODER_CV = 5
-CERO = 0
 
 # ── Column groups for preprocessing pipeline (see columns.py) ─────────────────
-VINTAGE_RE = re.compile(r"\b(19|20)\d{2}\b")
+VINTAGE_RE = re.compile(r"\b((?:19|20)\d{2})\b")

@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from diplo_mod_1.constants import CERO
-
 
 class PreprocessingResult(BaseModel):
     """Summary produced at the end of a full preprocessing run.
@@ -20,10 +18,10 @@ class PreprocessingResult(BaseModel):
         print(result.split_sizes["train"])
     """
 
-    n_rows: int = Field(gt=CERO)
-    xgb_features: int = Field(gt=CERO)
-    nn_tab_features: int = Field(gt=CERO)
-    txt_features: int = Field(gt=CERO)
+    n_rows: int = Field(gt=0)
+    xgb_features: int = Field(gt=0)
+    nn_tab_features: int = Field(gt=0)
+    txt_features: int = Field(gt=0)
     split_sizes: dict[str, int] = Field(
         description="Row counts per split keyed by 'train', 'val', 'test'."
     )
