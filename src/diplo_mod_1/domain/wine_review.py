@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pydantic import Field
 
+from diplo_mod_1.constants import POINTS_MAX, POINTS_MIN
 from diplo_mod_1.domain.base import BaseDomainModel
 
 
@@ -27,7 +28,7 @@ class WineReview(BaseDomainModel):
     country: str | None = None
     description: str
     designation: str | None = None
-    points: int = Field(ge=80, le=100)
+    points: int = Field(ge=POINTS_MIN, le=POINTS_MAX)
     price: float | None = Field(default=None, gt=0)
     province: str | None = None
     region_1: str | None = None

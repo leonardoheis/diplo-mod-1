@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from diplo_mod_1.constants import LUXURY_THRESHOLD, RANDOM_STATE, REF_YEAR
+from diplo_mod_1.constants import (
+    LUXURY_THRESHOLD,
+    RANDOM_STATE,
+    REF_YEAR,
+    TARGET_ENCODER_CV,
+    TEST_SIZE,
+    VAL_SIZE,
+    YEAR_MAX,
+    YEAR_MIN,
+)
 
 
 class DataCleanerConfig(BaseModel):
@@ -27,8 +36,8 @@ class FeatureEngineerConfig(BaseModel):
     @field_validator("ref_year")
     @classmethod
     def valid_year(cls, v: int) -> int:
-        if not (1900 <= v <= 2100):
-            raise ValueError("ref_year must be between 1900 and 2100")
+        if not (YEAR_MIN <= v <= YEAR_MAX):
+            raise ValueError(f"ref_year must be between {YEAR_MIN} and {YEAR_MAX}")
         return v
 
 
@@ -36,8 +45,8 @@ class DataSplitterConfig(BaseModel):
     """Hyperparameters for DataSplitter."""
 
     random_state: int = RANDOM_STATE
-    test_size: float = 0.2
-    val_size: float = 0.2
+    test_size: float = TEST_SIZE
+    val_size: float = VAL_SIZE
 
     @model_validator(mode="after")
     def valid_sizes(self) -> "DataSplitterConfig":
@@ -54,7 +63,7 @@ class TabularEncoderConfig(BaseModel):
     """Hyperparameters for TabularEncoder."""
 
     random_state: int = RANDOM_STATE
-    target_encoder_cv: int = 5
+    target_encoder_cv: int = TARGET_ENCODER_CV
 
     @field_validator("target_encoder_cv")
     @classmethod

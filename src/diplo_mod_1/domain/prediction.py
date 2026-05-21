@@ -6,6 +6,7 @@ from typing import Literal
 
 from pydantic import Field
 
+from diplo_mod_1.constants import POINTS_MAX, POINTS_MIN
 from diplo_mod_1.domain.base import BaseDomainModel
 
 
@@ -17,5 +18,5 @@ class WinePrediction(BaseDomainModel):
         pred = WinePrediction(predicted_points=91.4, model_type="xgboost")
     """
 
-    predicted_points: float = Field(ge=80.0, le=100.0)
+    predicted_points: float = Field(ge=POINTS_MIN, le=POINTS_MAX)
     model_type: Literal["xgboost", "neural_net"]
