@@ -30,6 +30,7 @@ dev = [
     "mypy",
     "pre-commit",
     "poethepoet",
+    "pytest-cov>=7.1.0",
 ]
 
 [tool.uv]
@@ -71,11 +72,17 @@ check_untyped_defs = false
 addopts = "-q"
 testpaths = ["tests"]
 
+[tool.coverage.run]
+source = ["diplo_mod_1"]
+branch = true
+omit = ["*/domain/predictor.py"]
+
 [tool.poe.tasks]
 lint = { shell = "ruff check . && ruff format --check ." }
 fmt = "ruff format ."
 typecheck = { shell = "mypy src && nbqa mypy notebooks" }
+test = "pytest tests/ --cov --cov-report=term-missing"
 nbtest = "pytest --nbmake notebooks"
-check = ["lint", "typecheck", "nbtest"]
+check = ["lint", "typecheck", "test", "nbtest"]
 precommit = "uv run pre-commit run --all-files --verbose"
 precommit-update = "uv run pre-commit run --hook-stage manual pre-commit-update"
