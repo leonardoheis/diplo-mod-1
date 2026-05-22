@@ -1,3 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(gh pr *)",
+      "PowerShell(gh pr *)"
+    ]
+  },
   "enabledPlugins": {}
 }
