@@ -27,7 +27,7 @@ uv run poe typecheck          # mypy src/ + nbqa mypy notebooks/
 uv run poe nbtest             # pytest --nbmake notebooks/ (slow, needs data/)
 ```
 
-Always run `uv run poe check` after making any change and fix any errors. Do not commit or push — the user handles all commits and pushes explicitly.
+Always run `uv run poe lint`, `uv run poe typecheck`, and `uv run poe test` (unit tests) after making any change and fix any errors. Do **not** run `uv run poe nbtest`, `uv run poe check`, or `jupyter nbconvert --execute` on notebooks — full notebook execution (including any live W&B runs it triggers) is the user's to run themselves. Do not commit or push — the user handles all commits and pushes explicitly.
 
 ## Project structure
 
@@ -35,9 +35,10 @@ Always run `uv run poe check` after making any change and fix any errors. Do not
 data/raw/        # Original files — READ ONLY, never modify
 data/interim/    # Intermediate outputs written by notebook 02
 data/processed/  # Train/test splits, model-ready features (written by 02, read by 03-05)
+configs/         # User-editable JSON configs (e.g. Optuna search spaces) — versioned in git
 notebooks/       # Numbered notebooks — must be run in order (00 → 06)
 src/diplo_mod_1/ # Reusable Python package (helpers, transforms, etc.)
-models/          # Saved model checkpoints — not versioned
+models/          # Saved model checkpoints — versioned in git
 reports/         # Final report and figures
 ```
 
@@ -73,4 +74,5 @@ uv run jupyter nbconvert --to notebook --execute notebooks/*.ipynb
 - PyTorch is configured to use Apple Silicon MPS when available. Don't add CUDA-specific code.
 - `notebooks/*.ipynb` ignores `F401` (unused imports) — exploratory cells intentionally import without always using.
 - `gitleaks` pre-commit hook will block commits containing secrets/API keys. Never hardcode credentials.
+- API keys (e.g. `WANDB_API_KEY`) go in `.env` (gitignored, loaded via `python-dotenv`), never inline. Copy `.env.example` to `.env` and fill in your own values.
 - When adding a new dependency: `uv add <package>` (updates both `pyproject.toml` and `uv.lock`).

@@ -9,6 +9,7 @@ INTERIM = Path("../data/interim")
 PROCESSED = Path("../data/processed")
 MODELS = Path("../models")
 REPORTS = Path("../reports")
+CONFIGS = Path("../configs")
 PRIMARY_CSV = "winemag-data-130k-v2.csv"
 
 # ── ML / preprocessing ──────────────────────────────────────────────────────
