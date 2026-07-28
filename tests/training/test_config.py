@@ -35,7 +35,8 @@ def test_from_json_round_trips(tmp_path: Path) -> None:
     assert loaded == original
 
 
-def test_repo_default_config_file_is_valid() -> None:
-    path = Path(__file__).parents[2] / "configs" / "xgboost_tuning.json"
+@pytest.mark.parametrize("filename", ["xgboost_tuning.json", "xgboost_tuning_wide.json"])
+def test_repo_config_files_are_valid(filename: str) -> None:
+    path = Path(__file__).parents[2] / "configs" / filename
     config = XGBoostTuningConfig.from_json(path)
     assert config.n_trials == 50
