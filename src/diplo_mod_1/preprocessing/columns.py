@@ -25,6 +25,37 @@ OHE_COLS: list[str] = []
 # Continuous features passed directly to the matrix (no encoding step)
 DIRECT_CONTINUOUS: list[str] = ["log_price", "wine_age", "description_length"]
 
+# Curated tasting-note vocabulary (from 01-eda.ipynb term-frequency analysis) —
+# each term becomes a `has_<term>` binary flag on `description`.
+TASTING_KEYWORDS: list[str] = [
+    "tannins",
+    "acidity",
+    "oak",
+    "cherry",
+    "spice",
+    "berry",
+    "plum",
+    "citrus",
+    "vanilla",
+    "pepper",
+    "crisp",
+    "sweet",
+    "dry",
+    "soft",
+    "rich",
+    "ripe",
+    "black",
+    "red",
+    "white",
+    "apple",
+    "blackberry",
+    "bodied",
+    "nose",
+    "finish",
+    "palate",
+]
+TASTING_FLAG_COLS: list[str] = [f"has_{term}" for term in TASTING_KEYWORDS]
+
 # Binary / flag features — excluded from scaling
 BINARY_COLS: list[str] = [
     "price_missing",
@@ -32,6 +63,7 @@ BINARY_COLS: list[str] = [
     "is_luxury",
     "is_us",
     "has_designation",
+    *TASTING_FLAG_COLS,
 ]
 
 # Derived name lists (convenience — do not edit directly)

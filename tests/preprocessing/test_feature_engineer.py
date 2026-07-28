@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from diplo_mod_1.constants import LUXURY_THRESHOLD, REF_YEAR
+from diplo_mod_1.preprocessing.columns import TASTING_FLAG_COLS, TASTING_KEYWORDS
 from diplo_mod_1.preprocessing.config import FeatureEngineerArtifacts
 from diplo_mod_1.preprocessing.feature_engineer import FeatureEngineer
 
@@ -73,6 +74,22 @@ def test_wine_age_non_negative(featured_df: pd.DataFrame) -> None:
 def test_wine_age_equals_ref_year_minus_vintage_year(featured_df: pd.DataFrame) -> None:
     expected = REF_YEAR - featured_df["vintage_year"]
     pd.testing.assert_series_equal(featured_df["wine_age"], expected, check_names=False)
+
+
+def test_tasting_keyword_flags_added(featured_df: pd.DataFrame) -> None:
+    assert set(TASTING_FLAG_COLS).issubset(set(featured_df.columns))
+    for col in TASTING_FLAG_COLS:
+        assert set(featured_df[col].unique()).issubset({0, 1})
+
+
+def test_tasting_keyword_flag_matches_description_substring(featured_df: pd.DataFrame) -> None:
+    term = TASTING_KEYWORDS[0]
+    expected = featured_df["description"].astype(str).str.contains(term, case=False, regex=False)
+    pd.testing.assert_series_equal(
+        featured_df[f"has_{term}"].astype(bool).reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
 
 
 def test_artifacts_returns_correct_values(small_raw_df: pd.DataFrame) -> None:

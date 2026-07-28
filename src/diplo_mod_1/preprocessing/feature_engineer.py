@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 from diplo_mod_1.constants import VINTAGE_RE
+from diplo_mod_1.preprocessing.columns import TASTING_KEYWORDS
 from diplo_mod_1.preprocessing.config import FeatureEngineerArtifacts, FeatureEngineerConfig
 
 
@@ -46,6 +47,11 @@ class FeatureEngineer:
         out["description_length"] = out["description"].astype(str).str.len()
         out["vintage_year"] = out["vintage_year"].fillna(self.median_vintage_)
         out["wine_age"] = self.config.ref_year - out["vintage_year"]
+
+        description = out["description"].astype(str)
+        for term in TASTING_KEYWORDS:
+            out[f"has_{term}"] = description.str.contains(term, case=False, regex=False).astype(int)
+
         return out
 
     @property
