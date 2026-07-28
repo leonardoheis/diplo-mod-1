@@ -140,14 +140,17 @@ data/**
 *.7z
 
 # ---- Trained models / checkpoints ----
+# models/ IS versioned — checkpoints are committed to git. The blanket
+# *.joblib/*.pt/etc. rules above still apply to data/ and experiment-tracking
+# output; these negations only re-include the same extensions under models/.
 models/*
 !models/.gitkeep
+!models/*.joblib
+!models/*.pt
+!models/*.pth
+!models/*.onnx
 checkpoints/
-*.pt
-*.pth
 *.ckpt
-*.onnx
-*.pb
 *.tflite
 saved_model/
 

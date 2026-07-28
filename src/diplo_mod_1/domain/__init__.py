@@ -1,6 +1,7 @@
 """Wine quality prediction domain layer."""
 
 from diplo_mod_1.domain.base import BaseDomainModel
+from diplo_mod_1.domain.evaluate import evaluate_predictor
 from diplo_mod_1.domain.metrics import ModelMetrics
 from diplo_mod_1.domain.prediction import WinePrediction
 from diplo_mod_1.domain.predictor import WineScorePredictor
@@ -12,4 +13,5 @@ __all__ = [
     "WinePrediction",
     "WineReview",
     "WineScorePredictor",
+    "evaluate_predictor",
 ]
