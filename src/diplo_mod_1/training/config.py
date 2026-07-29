@@ -45,6 +45,7 @@ class XGBoostTuningConfig(BaseModel):
     n_trials: int = Field(default=50, ge=1)
     early_stopping_rounds: int = Field(default=50, ge=1)
     random_state: int = RANDOM_STATE
+    device: str = "cpu"
     search_space: XGBoostSearchSpace = Field(default_factory=XGBoostSearchSpace)
 
     @classmethod

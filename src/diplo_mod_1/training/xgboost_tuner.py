@@ -37,6 +37,7 @@ class XGBoostTuner:
             **params,
             random_state=self.config.random_state,
             n_jobs=-1,
+            device=self.config.device,
             eval_metric="rmse",
             early_stopping_rounds=self.config.early_stopping_rounds,
         )
