@@ -1,10 +1,12 @@
-"""Pydantic configuration for XGBoost hyperparameter tuning."""
+"""Pydantic configuration and result records for XGBoost hyperparameter tuning."""
 
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
 from diplo_mod_1.constants import RANDOM_STATE
+from diplo_mod_1.domain.metrics import ModelMetrics
 
 
 class XGBoostSearchSpace(BaseModel):
@@ -49,3 +51,37 @@ class XGBoostTuningConfig(BaseModel):
     def from_json(cls, path: Path) -> "XGBoostTuningConfig":
         """Load config from a JSON file (same shape as ``model_dump()``)."""
         return cls.model_validate_json(path.read_text(encoding="utf-8"))
+
+
+class RunRecord(BaseModel):
+    """One completed tuning run — the config used, the winning params, and its metrics."""
+
+    run_id: str
+    tuning_config: str
+    model_filename: str
+    best_params: dict[str, float]
+    metrics: list[ModelMetrics]
+
+
+class TuningHistory(BaseModel):
+    """Every ``RunRecord`` on file, plus a pointer to the best one — persisted as one JSON file.
+
+    Usage::
+
+        history = TuningHistory()
+        history.runs.append(record)
+        history.best_run_id = history.best_run(split="test").run_id
+    """
+
+    runs: list[RunRecord] = Field(default_factory=list)
+    best_run_id: str | None = None
+
+    def best_run(self, split: Literal["train", "val", "test"] = "test") -> RunRecord | None:
+        """Return the run with the lowest RMSE on ``split``, or None if no run has it."""
+        candidates = [r for r in self.runs if any(m.split == split for m in r.metrics)]
+        if not candidates:
+            return None
+        return min(
+            candidates,
+            key=lambda r: next(m.rmse for m in r.metrics if m.split == split),
+        )

@@ -5,7 +5,13 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from diplo_mod_1.training.config import XGBoostSearchSpace, XGBoostTuningConfig
+from diplo_mod_1.domain.metrics import ModelMetrics
+from diplo_mod_1.training.config import (
+    RunRecord,
+    TuningHistory,
+    XGBoostSearchSpace,
+    XGBoostTuningConfig,
+)
 
 
 def test_default_config_valid() -> None:
@@ -35,8 +41,30 @@ def test_from_json_round_trips(tmp_path: Path) -> None:
     assert loaded == original
 
 
-@pytest.mark.parametrize("filename", ["xgboost_tuning.json", "xgboost_tuning_wide.json"])
-def test_repo_config_files_are_valid(filename: str) -> None:
-    path = Path(__file__).parents[2] / "configs" / filename
+CONFIGS_DIR = Path(__file__).parents[2] / "configs"
+
+
+@pytest.mark.parametrize("path", sorted(CONFIGS_DIR.glob("*.json")), ids=lambda p: p.name)
+def test_repo_config_files_are_valid(path: Path) -> None:
+    """Every configs/*.json file must parse and satisfy XGBoostTuningConfig's own validation.
+
+    Discovers files via glob rather than a hardcoded list, so a new
+    configs/*.json is covered automatically without editing this test.
+    Doesn't assert specific values (n_trials, bounds, ...) — those are meant
+    to be tuned freely; this only guards against a malformed/invalid file.
+    """
     config = XGBoostTuningConfig.from_json(path)
-    assert config.n_trials == 50
+    assert config.n_trials >= 1
+
+
+def test_best_run_returns_none_without_matching_split() -> None:
+    record = RunRecord(
+        run_id="run-a",
+        tuning_config="cfg.json",
+        model_filename="model.joblib",
+        best_params={},
+        metrics=[ModelMetrics(model_type="xgboost", split="train", rmse=1.0, mae=1.0, r2=0.5)],
+    )
+    history = TuningHistory(runs=[record])
+
+    assert history.best_run(split="test") is None
