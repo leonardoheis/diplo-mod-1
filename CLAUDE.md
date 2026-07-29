@@ -27,7 +27,7 @@ uv run poe typecheck          # mypy src/ + nbqa mypy notebooks/
 uv run poe nbtest             # pytest --nbmake notebooks/ (slow, needs data/)
 ```
 
-Always run `uv run poe lint`, `uv run poe typecheck`, and `uv run poe test` (unit tests) after making any change and fix any errors. Do **not** run `uv run poe nbtest`, `uv run poe check`, or `jupyter nbconvert --execute` on notebooks — full notebook execution (including any live W&B runs it triggers) is the user's to run themselves. Do not commit or push — the user handles all commits and pushes explicitly.
+Always run `uv run poe lint`, `uv run poe typecheck`, and `uv run poe test` (unit tests) after making any change and fix any errors. Do **not** run `uv run poe nbtest`, `uv run poe check`, or `jupyter nbconvert --execute` on notebooks — full notebook execution (including any live W&B runs it triggers) is the user's to run themselves. Do not commit, push, or open a PR — even when working on a feature/experiment branch — until the user explicitly says to. Prepare the changes and wait for that instruction.
 
 ## Project structure
 

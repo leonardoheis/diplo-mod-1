@@ -1,0 +1,16 @@
+{
+  "n_trials": 30,
+  "early_stopping_rounds": 50,
+  "random_state": 42,
+  "search_space": {
+    "max_depth": [3, 10],
+    "learning_rate": [0.001, 0.3],
+    "n_estimators": [100, 1500],
+    "subsample": [0.5, 1.0],
+    "colsample_bytree": [0.5, 1.0],
+    "min_child_weight": [1, 10],
+    "reg_alpha": [1e-8, 10.0],
+    "reg_lambda": [1e-8, 10.0],
+    "gamma": [1e-8, 5.0]
+  }
+}
