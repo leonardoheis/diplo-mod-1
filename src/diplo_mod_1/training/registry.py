@@ -34,7 +34,7 @@ class ModelRegistry:
         model: XGBRegressor,
         run_id: str,
         tuning_config_name: str,
-        best_params: dict[str, float],
+        best_params: dict[str, float | int | str],
         result: EvaluationResult,
     ) -> tuple[RunRecord, TuningHistory]:
         """Save ``model``, append its run to the history, and update the best pointer."""

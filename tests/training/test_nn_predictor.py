@@ -1,5 +1,8 @@
 """Tests for WineScorePredictorNet."""
 
+import numpy as np
+import pytest
+
 from diplo_mod_1.domain.predictor import WineScorePredictor
 from diplo_mod_1.training.nn_model import WineScorePredictorNet
 
@@ -47,6 +50,22 @@ def test_fit_without_validation_set_still_works(regression_split) -> None:
     model = WineScorePredictorNet(**_FAST_KWARGS)
     model.fit(X_train, y_train)
     assert len(model.train_losses_) == _FAST_KWARGS["max_epochs"]  # no early stop without val
+
+
+def test_predict_before_fit_raises_clear_error() -> None:
+    model = WineScorePredictorNet(**_FAST_KWARGS)
+    with pytest.raises(RuntimeError, match="fit"):
+        model.predict(np.zeros((2, 5), dtype=np.float32))
+
+
+def test_fit_drops_trailing_batch_of_size_one(regression_split) -> None:
+    """A trailing batch of exactly 1 sample would otherwise crash BatchNorm1d
+    ('Expected more than 1 value per channel when training')."""
+    X_train, y_train, X_val, y_val = regression_split
+    kwargs = dict(_FAST_KWARGS)
+    kwargs["batch_size"] = len(X_train) - 1  # last batch would have 1 sample
+    model = WineScorePredictorNet(**kwargs)
+    model.fit(X_train, y_train, X_val=X_val, y_val=y_val)  # must not raise
 
 
 def test_fit_invokes_callback(regression_split) -> None:

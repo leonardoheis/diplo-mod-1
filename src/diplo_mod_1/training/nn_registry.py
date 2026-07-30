@@ -40,10 +40,12 @@ class NNModelRegistry:
         model: WineScorePredictorNet,
         run_id: str,
         tuning_config_name: str,
-        best_params: dict[str, float],
+        best_params: dict[str, float | int | str],
         result: EvaluationResult,
     ) -> tuple[RunRecord, TuningHistory]:
         """Save ``model``, append its run to the history, and update the best pointer."""
+        if not hasattr(model, "model_"):
+            raise RuntimeError("Call fit() before save_run().")
         models_dir.mkdir(parents=True, exist_ok=True)
         metrics_path.parent.mkdir(parents=True, exist_ok=True)
 

@@ -37,3 +37,19 @@ def test_fit_best_returns_fitted_model(regression_split) -> None:
     model = tuner.fit_best(X_train, y_train, X_val, y_val, study)
     preds = model.predict(X_val)
     assert preds.shape == y_val.shape
+
+
+def test_fit_best_invokes_callback_once_per_epoch(regression_split) -> None:
+    X_train, y_train, X_val, y_val = regression_split
+    tuner = NNTuner(_FAST_CONFIG)
+    study = tuner.tune(X_train, y_train, X_val, y_val)
+    calls: list[int] = []
+    model = tuner.fit_best(
+        X_train,
+        y_train,
+        X_val,
+        y_val,
+        study,
+        callbacks=[lambda epoch, train_loss, val_loss: calls.append(epoch)],
+    )
+    assert calls == list(range(len(model.train_losses_)))

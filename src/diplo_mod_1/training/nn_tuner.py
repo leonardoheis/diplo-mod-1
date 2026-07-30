@@ -91,8 +91,10 @@ class NNTuner:
         X_val: FeatureMatrix,
         y_val: np.ndarray,
         study: optuna.Study,
+        *,
+        callbacks: list[Callable[[int, float, float], None]] | None = None,
     ) -> WineScorePredictorNet:
         """Refit on the winning trial's params, early-stopped against val."""
         model = self._make_model(X_train.shape[1], study.best_params)
-        model.fit(X_train, y_train, X_val=X_val, y_val=y_val)
+        model.fit(X_train, y_train, X_val=X_val, y_val=y_val, callbacks=callbacks)
         return model

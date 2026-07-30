@@ -4,6 +4,7 @@ from pathlib import Path
 
 from diplo_mod_1.domain.metrics import ModelMetrics
 from diplo_mod_1.schemas.evaluation import EvaluationResult
+from diplo_mod_1.training.config import TuningHistory
 from diplo_mod_1.training.nn_model import WineScorePredictorNet
 from diplo_mod_1.training.nn_registry import NNModelRegistry
 
@@ -57,6 +58,26 @@ def test_better_run_replaces_best(tmp_path: Path) -> None:
     )
 
     assert history.best_run_id == "run-b"
+
+
+def test_string_valued_best_params_round_trip(tmp_path: Path) -> None:
+    """NN best_params includes a categorical string (architecture) — regression
+    test for Pydantic silently coercing it to a garbage float (e.g.
+    "512_128_32" -> 51212832.0) instead of keeping it as a string.
+    """
+    metrics_path = tmp_path / "metrics.json"
+    best_params = {"architecture": "512_128_32", "dropout": 0.2, "batch_size": 128}
+
+    record, _ = NNModelRegistry.save_run(
+        tmp_path, metrics_path, _fitted_model(1), "run-a", "cfg.json", best_params, _result(1.5)
+    )
+
+    assert record.best_params["architecture"] == "512_128_32"
+
+    reloaded = TuningHistory.model_validate_json(metrics_path.read_text(encoding="utf-8"))
+    assert reloaded.runs[0].best_params["architecture"] == "512_128_32"
+    assert reloaded.runs[0].best_params["dropout"] == 0.2
+    assert reloaded.runs[0].best_params["batch_size"] == 128
 
 
 def test_loading_pre_existing_incompatible_file_starts_fresh(tmp_path: Path) -> None:

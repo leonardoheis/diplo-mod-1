@@ -8,6 +8,7 @@ from scipy import sparse
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
+from diplo_mod_1.constants import RANDOM_STATE
 from diplo_mod_1.domain.predictor import FeatureMatrix
 from diplo_mod_1.training.device import detect_torch_device
 
@@ -94,7 +95,7 @@ class WineScorePredictorNet:
         batch_size: int = 128,
         max_epochs: int = 100,
         early_stopping_patience: int = 10,
-        random_state: int = 42,
+        random_state: int = RANDOM_STATE,
         device: str | None = None,
     ) -> None:
         self.input_dim = input_dim
@@ -125,8 +126,14 @@ class WineScorePredictorNet:
         )
         loss_fn = nn.MSELoss()
 
+        train_dataset = SparseTabularDataset(X, y)
         train_loader = DataLoader(
-            SparseTabularDataset(X, y), batch_size=self.batch_size, shuffle=True
+            train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            # BatchNorm1d requires >1 sample per batch while training; drop a
+            # trailing batch of exactly 1 to avoid it.
+            drop_last=len(train_dataset) % self.batch_size == 1,
         )
         has_val = X_val is not None and y_val is not None
         val_loader = (
@@ -191,6 +198,8 @@ class WineScorePredictorNet:
         return self
 
     def predict(self, X: FeatureMatrix) -> np.ndarray:
+        if not hasattr(self, "model_"):
+            raise RuntimeError("Call fit() before predict().")
         device = self.device or detect_torch_device()
         self.model_.to(device)
         self.model_.eval()
