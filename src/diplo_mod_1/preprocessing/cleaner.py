@@ -55,7 +55,7 @@ class DataCleaner:
         out["price"] = out["price"].fillna(median_price).fillna(self.global_price_median_)
         out["price_missing"] = price_missing
 
-        for col in ["country", "region_1", "variety", "taster_name"]:
+        for col in ["country", "region_1", "variety", "taster_name", "province"]:
             out[col] = out[col].fillna("Unknown")
 
         return out

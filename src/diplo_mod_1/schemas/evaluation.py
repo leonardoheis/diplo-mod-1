@@ -2,9 +2,12 @@
 
 from typing import Literal
 
+import numpy as np
 from pydantic import BaseModel, Field
+from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 
 from diplo_mod_1.domain.metrics import ModelMetrics
+from diplo_mod_1.domain.predictor import FeatureMatrix, WineScorePredictor
 
 
 class EvaluationResult(BaseModel):
@@ -36,3 +39,28 @@ class EvaluationResult(BaseModel):
     def for_model(self, model_type: Literal["xgboost", "neural_net"]) -> list[ModelMetrics]:
         """Return all entries for a specific model type."""
         return [m for m in self.metrics if m.model_type == model_type]
+
+
+def evaluate_predictor(
+    model: WineScorePredictor,
+    splits: dict[Literal["train", "val", "test"], tuple[FeatureMatrix, np.ndarray]],
+    model_type: Literal["xgboost", "neural_net"],
+) -> EvaluationResult:
+    """Score ``model`` on each ``(X, y)`` split and collect the metrics.
+
+    Shared by notebooks 03 and 04 so both models are scored identically,
+    for the notebook 05 head-to-head comparison.
+    """
+    result = EvaluationResult()
+    for split_name, (X, y) in splits.items():
+        preds = model.predict(X)
+        result.add(
+            ModelMetrics(
+                model_type=model_type,
+                split=split_name,
+                rmse=root_mean_squared_error(y, preds),
+                mae=mean_absolute_error(y, preds),
+                r2=r2_score(y, preds),
+            )
+        )
+    return result

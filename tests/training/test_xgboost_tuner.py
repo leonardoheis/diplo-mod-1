@@ -2,9 +2,10 @@
 
 import numpy as np
 import optuna
+from scipy import sparse
 
 from diplo_mod_1.training.config import XGBoostSearchSpace, XGBoostTuningConfig
-from diplo_mod_1.training.xgboost_tuner import XGBoostTuner
+from diplo_mod_1.training.xgboost_tuner import XGBoostTuner, detect_device
 
 _FAST_CONFIG = XGBoostTuningConfig(
     n_trials=2,
@@ -43,3 +44,25 @@ def test_fit_best_returns_fitted_model(
     model = tuner.fit_best(X_train, y_train, X_val, y_val, study)
     preds = model.predict(X_val)
     assert preds.shape == y_val.shape
+
+
+def test_tune_and_fit_best_accept_sparse_input(
+    regression_split: tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+) -> None:
+    """XGBoost's sklearn API accepts sparse features (e.g. dense tabular
+    columns hstacked with sparse TF-IDF columns) — confirm the tuner does too.
+    """
+    X_train, y_train, X_val, y_val = regression_split
+    X_train_sparse = sparse.csr_matrix(X_train)
+    X_val_sparse = sparse.csr_matrix(X_val)
+
+    tuner = XGBoostTuner(_FAST_CONFIG)
+    study = tuner.tune(X_train_sparse, y_train, X_val_sparse, y_val)
+    model = tuner.fit_best(X_train_sparse, y_train, X_val_sparse, y_val, study)
+
+    preds = model.predict(X_val_sparse)
+    assert preds.shape == y_val.shape
+
+
+def test_detect_device_returns_cpu_or_cuda() -> None:
+    assert detect_device() in {"cpu", "cuda"}

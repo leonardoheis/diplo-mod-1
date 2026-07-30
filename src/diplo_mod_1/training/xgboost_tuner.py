@@ -1,15 +1,40 @@
 """XGBoostTuner — Optuna-based hyperparameter search for XGBRegressor."""
 
 from collections.abc import Callable
+from functools import lru_cache
 
 import numpy as np
 import optuna
 from sklearn.metrics import root_mean_squared_error
 from xgboost import XGBRegressor
 
+from diplo_mod_1.domain.predictor import FeatureMatrix
 from diplo_mod_1.training.config import XGBoostTuningConfig
 
 OptunaTrialCallback = Callable[[optuna.Study, optuna.trial.FrozenTrial], None]
+
+
+@lru_cache(maxsize=1)
+def detect_device() -> str:
+    """CUDA if XGBoost can actually train on it here, else CPU.
+
+    XGBoost has no Apple Silicon/MPS backend (unlike the PyTorch NN in
+    notebook 04) — CUDA is the only GPU path. Probes XGBoost directly rather
+    than trusting ``torch.cuda.is_available()``: XGBoost bundles its own CUDA
+    runtime independent of torch's, so a CPU-only torch build (as this
+    project's resolves to) says nothing about whether XGBoost's CUDA works.
+    Cached — the throwaway fit only runs once per process.
+    """
+    try:
+        XGBRegressor(tree_method="hist", device="cuda", n_estimators=1).fit(
+            np.zeros((2, 1), dtype=np.float32), np.zeros(2, dtype=np.float32)
+        )
+        device = "cuda"
+    except Exception:
+        device = "cpu"
+
+    print(f"XGBoost device: {device}")
+    return device
 
 
 class XGBoostTuner:
@@ -37,15 +62,17 @@ class XGBoostTuner:
             **params,
             random_state=self.config.random_state,
             n_jobs=-1,
+            tree_method="hist",
+            device=detect_device(),
             eval_metric="rmse",
             early_stopping_rounds=self.config.early_stopping_rounds,
         )
 
     def _build_objective(
         self,
-        X_train: np.ndarray,
+        X_train: FeatureMatrix,
         y_train: np.ndarray,
-        X_val: np.ndarray,
+        X_val: FeatureMatrix,
         y_val: np.ndarray,
     ) -> Callable[[optuna.Trial], float]:
         space = self.config.search_space
@@ -76,9 +103,9 @@ class XGBoostTuner:
 
     def tune(
         self,
-        X_train: np.ndarray,
+        X_train: FeatureMatrix,
         y_train: np.ndarray,
-        X_val: np.ndarray,
+        X_val: FeatureMatrix,
         y_val: np.ndarray,
         callbacks: list[OptunaTrialCallback] | None = None,
     ) -> optuna.Study:
@@ -102,9 +129,9 @@ class XGBoostTuner:
 
     def fit_best(
         self,
-        X_train: np.ndarray,
+        X_train: FeatureMatrix,
         y_train: np.ndarray,
-        X_val: np.ndarray,
+        X_val: FeatureMatrix,
         y_val: np.ndarray,
         study: optuna.Study,
     ) -> XGBRegressor:

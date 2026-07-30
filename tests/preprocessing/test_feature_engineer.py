@@ -100,3 +100,46 @@ def test_artifacts_returns_correct_values(small_raw_df: pd.DataFrame) -> None:
     assert arts.median_vintage == fe.median_vintage_
     assert arts.luxury_threshold == LUXURY_THRESHOLD
     assert arts.ref_year == REF_YEAR
+    assert arts.variety_avg_log_price == fe.variety_avg_log_price_
+
+
+def test_price_vs_variety_added(featured_df: pd.DataFrame) -> None:
+    assert "price_vs_variety" in featured_df.columns
+    assert featured_df["price_vs_variety"].notna().all()
+
+
+def test_price_vs_variety_computed_correctly(
+    small_raw_df: pd.DataFrame, cleaned_df: pd.DataFrame, featured_df: pd.DataFrame
+) -> None:
+    fe = FeatureEngineer()
+    fe.fit(small_raw_df)
+    assert fe.variety_avg_log_price_ is not None
+
+    variety_avg = cleaned_df["variety"].map(fe.variety_avg_log_price_)
+    expected = np.log1p(cleaned_df["price"]) - variety_avg
+    np.testing.assert_allclose(
+        featured_df["price_vs_variety"].to_numpy(), expected.to_numpy(), rtol=1e-5
+    )
+
+
+def test_price_vs_variety_zero_for_average_priced_wine(small_raw_df: pd.DataFrame) -> None:
+    """A wine priced exactly at its variety's average should score ~0."""
+    fe = FeatureEngineer()
+    fe.fit(small_raw_df)
+    assert fe.variety_avg_log_price_ is not None
+    variety = next(iter(fe.variety_avg_log_price_))
+    avg_log_price = fe.variety_avg_log_price_[variety]
+
+    row = small_raw_df.iloc[[0]].copy()
+    row["variety"] = variety
+    row["price"] = np.expm1(avg_log_price)
+    row["title"] = "Test Winery 2015 Reserve"
+
+    from diplo_mod_1.preprocessing.cleaner import DataCleaner
+
+    cleaner = DataCleaner()
+    cleaner.fit(small_raw_df)
+    cleaned_row = cleaner.clean(row)
+    result = fe.transform(cleaned_row)
+
+    assert result["price_vs_variety"].iloc[0] == pytest.approx(0.0, abs=1e-4)
