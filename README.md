@@ -95,8 +95,8 @@ This allows a direct comparison between a classical approach and a Deep Learning
 │   └── diplo_mod_1/
 │       ├── domain/       # Value objects, metrics, WineScorePredictor protocol
 │       ├── preprocessing/# Cleaning, feature engineering, encoding, splitting
-│       ├── schemas/      # Pipeline/evaluation result schemas
-│       └── training/     # XGBoostTuner — Optuna-based hyperparameter search
+│       ├── schemas/      # Pipeline/evaluation result schemas, evaluate_predictor
+│       └── training/     # XGBoostTuner, ModelRegistry, GPU auto-detection, shap compat shim
 ├── models/               # Trained models / checkpoints — versioned in git
 ├── reports/              # Final report, figures, and metrics JSON
 ├── .env.example          # Template for local secrets (copy to .env)
@@ -139,14 +139,28 @@ The contents of `data/` are not versioned — only `.gitkeep` files are committe
 
 The classical ML model (`notebooks/03-train-baseline-xgboost.ipynb`) tunes XGBoost with [Optuna](https://optuna.org/) (Bayesian TPE search, early-stopped against the validation split) via a reusable `XGBoostTuner` class (`src/diplo_mod_1/training/`).
 
-- **Search space** — `n_trials`, early-stopping patience, and every hyperparameter's bounds live in [`configs/xgboost_tuning.json`](configs/xgboost_tuning.json), editable without touching code.
+- **Search space** — `n_trials`, early-stopping patience, and every hyperparameter's bounds live in [`configs/xgboost_tuning.json`](configs/xgboost_tuning.json) (and sibling `configs/xgboost_tuning_*.json` variants), selectable via the `XGBOOST_TUNING_CONFIG` env var, editable without touching code.
+- **GPU acceleration** is automatic, not manual — `detect_device()` probes XGBoost's own CUDA capability directly (not `torch.cuda.is_available()`, since this project's torch build can be CPU-only independent of XGBoost's bundled CUDA runtime) and falls back to CPU. Works unmodified on both an NVIDIA/Windows machine and Apple Silicon/Mac (XGBoost has no MPS backend, so it's CPU there — still fast via the native arm64 wheel).
+- **Model checkpoints are versioned, not overwritten** — `ModelRegistry` (`src/diplo_mod_1/training/registry.py`) saves one `models/xgboost_<run_id>.joblib` per run and keeps `models/xgboost_best.joblib` pointing at whichever run has the lowest test RMSE on record. `reports/xgboost_metrics.json` accumulates every run's hyperparameters and metrics, so different search spaces and feature sets stay comparable side by side (notebook 03, Step 9).
+- **Explainability** — `shap.TreeExplainer` (notebook 03, Step 13) runs against the current overall-best model, loaded fresh from disk, with a top-feature summary plot and table.
 - **Experiment tracking** to [Weights & Biases](https://wandb.ai/) is opt-in and off by default, so routine `poe check` / `poe nbtest` runs never create a W&B run:
 
   ```bash
   cp .env.example .env   # then fill in WANDB_API_KEY
   ```
 
-  In `.env`, set `WANDB_ENABLED=true` to log each run's config, every Optuna trial, baseline and final metrics, the feature-importance plot, and the model checkpoint as a W&B artifact. `WANDB_PROJECT` and `WANDB_RUN_NAME` are optional overrides (a descriptive run name is auto-generated from the tuning config otherwise).
+  In `.env`, set `WANDB_ENABLED=true` to log each run's config, every Optuna trial, baseline/final metrics, feature-importance and SHAP plots, and the model checkpoint as a W&B artifact. `WANDB_PROJECT` and `WANDB_RUN_NAME` are optional overrides (a descriptive run name is auto-generated from the tuning config otherwise).
+
+## Current best result (XGBoost)
+
+Hyperparameter tuning alone (≈10 separate Optuna searches, varying depth/regularization/learning rate) plateaued at test R² ≈ 0.71-0.73 — differences between configs were within noise of each other. What actually moved it: **giving XGBoost the review text.** Stacking the TF-IDF matrix already built for the neural-network dataset (2000 terms) onto the 44 engineered tabular columns and re-running the same tuning process:
+
+| | test RMSE | test R² |
+| --- | --- | --- |
+| Best tabular-only config | 1.594 | 0.726 |
+| **Best tabular + TF-IDF (current `models/xgboost_best.joblib`)** | **1.445** | **0.775** |
+
+SHAP analysis independently confirms this: the top features by mean absolute SHAP value are almost entirely TF-IDF text terms, not tabular columns — the review text is now the dominant signal for predicting `points`, not a marginal add-on.
 
 ## Quality and linting
 
@@ -207,7 +221,8 @@ uv run python src/script.py
 
 - Python 3.10+
 - pandas, numpy, scikit-learn, matplotlib, seaborn, fg-data-profiling
-- XGBoost (classical ML model), tuned with Optuna (Bayesian hyperparameter search)
+- XGBoost (classical ML model), tuned with Optuna (Bayesian hyperparameter search), GPU-accelerated via CUDA when available
+- SHAP (model explainability)
 - PyTorch (neural network, with Apple Silicon / MPS GPU support)
 - Weights & Biases (optional experiment tracking), python-dotenv (local config via `.env`)
 - Jupyter / JupyterLab
