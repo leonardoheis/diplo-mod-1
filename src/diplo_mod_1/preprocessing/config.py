@@ -130,3 +130,4 @@ class FeatureEngineerArtifacts(BaseModel):
     luxury_threshold: float
     ref_year: int
     median_vintage: float
+    variety_avg_log_price: dict[str, float]

@@ -11,19 +11,26 @@ TARGET_ENCODE_COLS: list[tuple[str, str]] = [
     ("country", "country_avg_points"),
     ("region_1", "region1_avg_points"),
     ("winery", "winery_avg_points"),
+    ("province", "province_avg_points"),
 ]
 
 # (source_column, encoded_feature_name) pairs — log-frequency maps
 FREQ_COLS: list[tuple[str, str]] = [
     ("winery", "winery_freq"),
     ("variety", "variety_review_count"),
+    ("region_1", "region1_freq"),
 ]
 
 # One-hot encoded columns (empty: taster_name and country already target-encoded)
 OHE_COLS: list[str] = []
 
 # Continuous features passed directly to the matrix (no encoding step)
-DIRECT_CONTINUOUS: list[str] = ["log_price", "wine_age", "description_length"]
+DIRECT_CONTINUOUS: list[str] = [
+    "log_price",
+    "wine_age",
+    "description_length",
+    "price_vs_variety",
+]
 
 # Curated tasting-note vocabulary (from 01-eda.ipynb term-frequency analysis) —
 # each term becomes a `has_<term>` binary flag on `description`.
