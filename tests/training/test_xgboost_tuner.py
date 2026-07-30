@@ -5,7 +5,7 @@ import optuna
 from scipy import sparse
 
 from diplo_mod_1.training.config import XGBoostSearchSpace, XGBoostTuningConfig
-from diplo_mod_1.training.xgboost_tuner import XGBoostTuner, detect_device
+from diplo_mod_1.training.xgboost_tuner import XGBoostTuner
 
 _FAST_CONFIG = XGBoostTuningConfig(
     n_trials=2,
@@ -62,7 +62,3 @@ def test_tune_and_fit_best_accept_sparse_input(
 
     preds = model.predict(X_val_sparse)
     assert preds.shape == y_val.shape
-
-
-def test_detect_device_returns_cpu_or_cuda() -> None:
-    assert detect_device() in {"cpu", "cuda"}
