@@ -1,6 +1,7 @@
 """Tests for evaluate_predictor."""
 
 import numpy as np
+from scipy import sparse
 
 from diplo_mod_1.schemas.evaluation import EvaluationResult, evaluate_predictor
 
@@ -12,7 +13,7 @@ class _ConstantPredictor:
         self.value = value
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        return np.full(len(X), self.value, dtype=np.float32)
+        return np.full(X.shape[0], self.value, dtype=np.float32)
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "_ConstantPredictor":
         return self
@@ -44,3 +45,11 @@ def test_model_type_propagated() -> None:
     splits = {"test": (np.zeros((2, 2)), np.array([90.0, 91.0]))}
     result = evaluate_predictor(model, splits, model_type="neural_net")
     assert result.metrics[0].model_type == "neural_net"
+
+
+def test_accepts_sparse_feature_matrix() -> None:
+    """X may be sparse (e.g. tabular + TF-IDF hstacked) — not just dense np.ndarray."""
+    model = _ConstantPredictor(90.0)
+    splits = {"test": (sparse.csr_matrix(np.zeros((3, 2))), np.full(3, 90.0))}
+    result = evaluate_predictor(model, splits, model_type="xgboost")
+    assert result.best(split="test").rmse == 0.0

@@ -7,7 +7,7 @@ from diplo_mod_1.training.config import (
     XGBoostTuningConfig,
 )
 from diplo_mod_1.training.registry import ModelRegistry
-from diplo_mod_1.training.xgboost_tuner import XGBoostTuner
+from diplo_mod_1.training.xgboost_tuner import XGBoostTuner, detect_device
 
 __all__ = [
     "ModelRegistry",
@@ -16,4 +16,5 @@ __all__ = [
     "XGBoostSearchSpace",
     "XGBoostTuner",
     "XGBoostTuningConfig",
+    "detect_device",
 ]

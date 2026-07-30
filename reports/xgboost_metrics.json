@@ -311,7 +311,202 @@
           "r2": 0.7117643356323242
         }
       ]
+    },
+    {
+      "run_id": "xgboost_tuning_text_probe-20260730T025021Z",
+      "tuning_config": "xgboost_tuning_text_probe.json",
+      "model_filename": "xgboost_tuning_text_probe-20260730T025021Z.joblib",
+      "best_params": {
+        "max_depth": 5.0,
+        "learning_rate": 0.2536999076681772,
+        "n_estimators": 393.0,
+        "subsample": 0.7993292420985183,
+        "colsample_bytree": 0.5780093202212182,
+        "min_child_weight": 2.0,
+        "reg_alpha": 3.3323645788192616e-8,
+        "reg_lambda": 0.6245760287469893,
+        "gamma": 0.0016946556203947059
+      },
+      "metrics": [
+        {
+          "model_type": "xgboost",
+          "split": "train",
+          "rmse": 1.4421876668930054,
+          "mae": 1.1254048347473145,
+          "r2": 0.7746058106422424
+        },
+        {
+          "model_type": "xgboost",
+          "split": "val",
+          "rmse": 1.6763379573822021,
+          "mae": 1.3118767738342285,
+          "r2": 0.696460485458374
+        },
+        {
+          "model_type": "xgboost",
+          "split": "test",
+          "rmse": 1.665891408920288,
+          "mae": 1.3010752201080322,
+          "r2": 0.7004338502883911
+        }
+      ]
+    },
+    {
+      "run_id": "xgboost_tuning_text_probe+text-20260730T025129Z",
+      "tuning_config": "xgboost_tuning_text_probe.json+text",
+      "model_filename": "xgboost_tuning_text_probe+text-20260730T025129Z.joblib",
+      "best_params": {
+        "max_depth": 5.0,
+        "learning_rate": 0.2536999076681772,
+        "n_estimators": 393.0,
+        "subsample": 0.7993292420985183,
+        "colsample_bytree": 0.5780093202212182,
+        "min_child_weight": 2.0,
+        "reg_alpha": 3.3323645788192616e-8,
+        "reg_lambda": 0.6245760287469893,
+        "gamma": 0.0016946556203947059
+      },
+      "metrics": [
+        {
+          "model_type": "xgboost",
+          "split": "train",
+          "rmse": 1.1933107376098633,
+          "mae": 0.9440149664878845,
+          "r2": 0.8456856608390808
+        },
+        {
+          "model_type": "xgboost",
+          "split": "val",
+          "rmse": 1.4584499597549438,
+          "mae": 1.1371808052062988,
+          "r2": 0.7702395915985107
+        },
+        {
+          "model_type": "xgboost",
+          "split": "test",
+          "rmse": 1.4680531024932861,
+          "mae": 1.1420459747314453,
+          "r2": 0.7673608064651489
+        }
+      ]
+    },
+    {
+      "run_id": "xgboost_tuning_text_probe_v1-20260730T032948Z",
+      "tuning_config": "xgboost_tuning_text_probe_v1.json",
+      "model_filename": "xgboost_tuning_text_probe_v1-20260730T032948Z.joblib",
+      "best_params": {
+        "max_depth": 11.0,
+        "learning_rate": 0.026143524424861564,
+        "n_estimators": 1483.0,
+        "subsample": 0.8854891975142214,
+        "colsample_bytree": 0.5431243688585969,
+        "min_child_weight": 8.0,
+        "reg_alpha": 4.249827895100718e-6,
+        "reg_lambda": 1.363596413377054e-6,
+        "gamma": 9.761379964286413e-7
+      },
+      "metrics": [
+        {
+          "model_type": "xgboost",
+          "split": "train",
+          "rmse": 0.5661389231681824,
+          "mae": 0.4108661115169525,
+          "r2": 0.965266764163971
+        },
+        {
+          "model_type": "xgboost",
+          "split": "val",
+          "rmse": 1.6000196933746338,
+          "mae": 1.2348201274871826,
+          "r2": 0.7234697341918945
+        },
+        {
+          "model_type": "xgboost",
+          "split": "test",
+          "rmse": 1.5960278511047363,
+          "mae": 1.2277319431304932,
+          "r2": 0.725033164024353
+        }
+      ]
+    },
+    {
+      "run_id": "xgboost_tuning_text_probe_v2-20260730T130905Z",
+      "tuning_config": "xgboost_tuning_text_probe_v2.json",
+      "model_filename": "xgboost_tuning_text_probe_v2-20260730T130905Z.joblib",
+      "best_params": {
+        "max_depth": 8.0,
+        "learning_rate": 0.09128035188473145,
+        "n_estimators": 398.0,
+        "subsample": 0.8314588717765954,
+        "colsample_bytree": 0.621777069078813,
+        "min_child_weight": 10.0,
+        "reg_alpha": 1.1146549754165801e-7,
+        "reg_lambda": 5.319721597496823e-6,
+        "gamma": 2.8815495522377273e-7
+      },
+      "metrics": [
+        {
+          "model_type": "xgboost",
+          "split": "train",
+          "rmse": 1.2009968757629395,
+          "mae": 0.9278573393821716,
+          "r2": 0.843691349029541
+        },
+        {
+          "model_type": "xgboost",
+          "split": "val",
+          "rmse": 1.6364963054656982,
+          "mae": 1.2758491039276123,
+          "r2": 0.710717499256134
+        },
+        {
+          "model_type": "xgboost",
+          "split": "test",
+          "rmse": 1.6309088468551636,
+          "mae": 1.2666507959365845,
+          "r2": 0.7128831148147583
+        }
+      ]
+    },
+    {
+      "run_id": "xgboost_tuning_text_probe_v2+text-20260730T131147Z",
+      "tuning_config": "xgboost_tuning_text_probe_v2.json+text",
+      "model_filename": "xgboost_tuning_text_probe_v2+text-20260730T131147Z.joblib",
+      "best_params": {
+        "max_depth": 7.0,
+        "learning_rate": 0.1376745040972406,
+        "n_estimators": 486.0,
+        "subsample": 0.9713386595732587,
+        "colsample_bytree": 0.8781008449058327,
+        "min_child_weight": 5.0,
+        "reg_alpha": 0.0006842761454463577,
+        "reg_lambda": 2.489962422261251e-8,
+        "gamma": 0.0003476681165664887
+      },
+      "metrics": [
+        {
+          "model_type": "xgboost",
+          "split": "train",
+          "rmse": 1.0594550371170044,
+          "mae": 0.8340632915496826,
+          "r2": 0.8783633708953857
+        },
+        {
+          "model_type": "xgboost",
+          "split": "val",
+          "rmse": 1.433497428894043,
+          "mae": 1.110361099243164,
+          "r2": 0.7780342698097229
+        },
+        {
+          "model_type": "xgboost",
+          "split": "test",
+          "rmse": 1.4453157186508179,
+          "mae": 1.1202623844146729,
+          "r2": 0.7745112776756287
+        }
+      ]
     }
   ],
-  "best_run_id": "xgboost_tuning_wide_v2-20260729T232250Z"
+  "best_run_id": "xgboost_tuning_text_probe_v2+text-20260730T131147Z"
 }

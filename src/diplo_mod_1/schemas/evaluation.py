@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from sklearn.metrics import mean_absolute_error, r2_score, root_mean_squared_error
 
 from diplo_mod_1.domain.metrics import ModelMetrics
-from diplo_mod_1.domain.predictor import WineScorePredictor
+from diplo_mod_1.domain.predictor import FeatureMatrix, WineScorePredictor
 
 
 class EvaluationResult(BaseModel):
@@ -43,7 +43,7 @@ class EvaluationResult(BaseModel):
 
 def evaluate_predictor(
     model: WineScorePredictor,
-    splits: dict[Literal["train", "val", "test"], tuple[np.ndarray, np.ndarray]],
+    splits: dict[Literal["train", "val", "test"], tuple[FeatureMatrix, np.ndarray]],
     model_type: Literal["xgboost", "neural_net"],
 ) -> EvaluationResult:
     """Score ``model`` on each ``(X, y)`` split and collect the metrics.
