@@ -1,40 +1,41 @@
 {
   "runs": [
     {
-      "run_id": "nn_tabular_ablation-20260731T003924Z",
-      "tuning_config": "nn_training.json",
+      "run_id": "nn_tabular_ablation-20260731T202427Z",
+      "tuning_config": "nn_training_wide_v1.json",
       "model_filename": "nn_tabular_ablation.pt",
       "best_params": {
-        "architecture": "512_128_32",
-        "dropout": 0.15636968998990508,
-        "learning_rate": 0.0040215545266902904,
-        "weight_decay": 1.987021538542864e-6,
+        "architecture": "256_64",
+        "dropout": 0.2246844304357644,
+        "activation": "gelu",
+        "learning_rate": 0.025221951700214282,
+        "weight_decay": 0.001260466458564947,
         "batch_size": 64
       },
       "metrics": [
         {
           "model_type": "neural_net",
           "split": "train",
-          "rmse": 1.6775882244110107,
-          "mae": 1.3004121780395508,
-          "r2": 0.6950210332870483
+          "rmse": 1.5286970138549805,
+          "mae": 1.179888367652893,
+          "r2": 0.7467543482780457
         },
         {
           "model_type": "neural_net",
           "split": "val",
-          "rmse": 1.9474475383758545,
-          "mae": 1.5224426984786987,
-          "r2": 0.5903398990631104
+          "rmse": 1.8565452098846436,
+          "mae": 1.442830204963684,
+          "r2": 0.6276913285255432
         },
         {
           "model_type": "neural_net",
           "split": "test",
-          "rmse": 1.95758855342865,
-          "mae": 1.5291438102722168,
-          "r2": 0.5863412618637085
+          "rmse": 1.8694294691085815,
+          "mae": 1.4459279775619507,
+          "r2": 0.6227601766586304
         }
       ]
     }
   ],
-  "best_run_id": "nn_tabular_ablation-20260731T003924Z"
+  "best_run_id": "nn_tabular_ablation-20260731T202427Z"
 }

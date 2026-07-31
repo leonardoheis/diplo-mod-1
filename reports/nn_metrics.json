@@ -34,7 +34,78 @@
           "r2": 0.7253940105438232
         }
       ]
+    },
+    {
+      "run_id": "nn_training_wide-20260731T135247Z",
+      "tuning_config": "nn_training_wide.json",
+      "model_filename": "nn_training_wide-20260731T135247Z.pt",
+      "best_params": {
+        "architecture": "512_128_32",
+        "dropout": 0.26676984333100023,
+        "learning_rate": 0.008177120620710018,
+        "weight_decay": 0.00002100480586383109,
+        "batch_size": 64
+      },
+      "metrics": [
+        {
+          "model_type": "neural_net",
+          "split": "train",
+          "rmse": 1.0609302520751953,
+          "mae": 0.8208267092704773,
+          "r2": 0.8780244588851929
+        },
+        {
+          "model_type": "neural_net",
+          "split": "val",
+          "rmse": 1.4728082418441772,
+          "mae": 1.1380549669265747,
+          "r2": 0.7656934261322021
+        },
+        {
+          "model_type": "neural_net",
+          "split": "test",
+          "rmse": 1.4788540601730347,
+          "mae": 1.14127516746521,
+          "r2": 0.7639250159263611
+        }
+      ]
+    },
+    {
+      "run_id": "nn_training_wide_v1-20260731T174724Z",
+      "tuning_config": "nn_training_wide_v1.json",
+      "model_filename": "nn_training_wide_v1-20260731T174724Z.pt",
+      "best_params": {
+        "architecture": "512_128_32",
+        "dropout": 0.43554561827704763,
+        "activation": "silu",
+        "learning_rate": 0.027008898055781647,
+        "weight_decay": 0.002473611720952046,
+        "batch_size": 128
+      },
+      "metrics": [
+        {
+          "model_type": "neural_net",
+          "split": "train",
+          "rmse": 0.9318777322769165,
+          "mae": 0.718096137046814,
+          "r2": 0.9058940410614014
+        },
+        {
+          "model_type": "neural_net",
+          "split": "val",
+          "rmse": 1.4494339227676392,
+          "mae": 1.1176759004592896,
+          "r2": 0.7730715274810791
+        },
+        {
+          "model_type": "neural_net",
+          "split": "test",
+          "rmse": 1.4627264738082886,
+          "mae": 1.1251903772354126,
+          "r2": 0.7690459489822388
+        }
+      ]
     }
   ],
-  "best_run_id": "nn_training-20260730T222845Z"
+  "best_run_id": "nn_training_wide_v1-20260731T174724Z"
 }

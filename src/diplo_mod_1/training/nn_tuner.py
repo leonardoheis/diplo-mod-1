@@ -35,6 +35,7 @@ class NNTuner:
             input_dim=input_dim,
             hidden_sizes=hidden_sizes,
             dropout=float(params["dropout"]),
+            activation=str(params["activation"]),
             learning_rate=float(params["learning_rate"]),
             weight_decay=float(params["weight_decay"]),
             batch_size=int(params["batch_size"]),
@@ -43,6 +44,17 @@ class NNTuner:
             random_state=self.config.random_state,
             device=detect_torch_device(),
         )
+
+    @staticmethod
+    def _make_pruning_callback(trial: optuna.Trial) -> Callable[[int, float, float], None]:
+        """Report each epoch's val loss to Optuna and stop the trial if it should be pruned."""
+
+        def callback(epoch: int, train_loss: float, val_loss: float) -> None:
+            trial.report(val_loss, epoch)
+            if trial.should_prune():
+                raise optuna.TrialPruned()
+
+        return callback
 
     def _build_objective(
         self, X_train: FeatureMatrix, y_train: np.ndarray, X_val: FeatureMatrix, y_val: np.ndarray
@@ -53,6 +65,7 @@ class NNTuner:
             params = {
                 "architecture": trial.suggest_categorical("architecture", space.architecture),
                 "dropout": trial.suggest_float("dropout", *space.dropout),
+                "activation": trial.suggest_categorical("activation", space.activation),
                 "learning_rate": trial.suggest_float(
                     "learning_rate", *space.learning_rate, log=True
                 ),
@@ -60,7 +73,13 @@ class NNTuner:
                 "batch_size": trial.suggest_categorical("batch_size", space.batch_size),
             }
             model = self._make_model(X_train.shape[1], params)
-            model.fit(X_train, y_train, X_val=X_val, y_val=y_val)
+            model.fit(
+                X_train,
+                y_train,
+                X_val=X_val,
+                y_val=y_val,
+                callbacks=[self._make_pruning_callback(trial)],
+            )
             return root_mean_squared_error(y_val, model.predict(X_val))
 
         return objective
@@ -78,6 +97,7 @@ class NNTuner:
         study = optuna.create_study(
             direction="minimize",
             sampler=optuna.samplers.TPESampler(seed=self.config.random_state),
+            pruner=optuna.pruners.MedianPruner(n_warmup_steps=3),
         )
         study.optimize(
             objective, n_trials=self.config.n_trials, show_progress_bar=True, callbacks=callbacks

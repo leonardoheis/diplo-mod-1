@@ -13,8 +13,11 @@ from diplo_mod_1.domain.predictor import FeatureMatrix
 from diplo_mod_1.training.device import detect_torch_device
 
 
+_ACTIVATIONS: dict[str, type[nn.Module]] = {"relu": nn.ReLU, "gelu": nn.GELU, "silu": nn.SiLU}
+
+
 class WineScoreNet(nn.Module):
-    """Feed-forward MLP regressor: ``[Linear -> BatchNorm1d -> ReLU -> Dropout]``
+    """Feed-forward MLP regressor: ``[Linear -> BatchNorm1d -> Activation -> Dropout]``
     per hidden layer, then a single ``Linear(*, 1)`` output.
 
     Trained on the full concatenated feature matrix (tabular + TF-IDF, 2044
@@ -22,14 +25,21 @@ class WineScoreNet(nn.Module):
     already worked for XGBoost, not a two-branch architecture.
     """
 
-    def __init__(self, input_dim: int, hidden_sizes: list[int], dropout: float = 0.2) -> None:
+    def __init__(
+        self,
+        input_dim: int,
+        hidden_sizes: list[int],
+        dropout: float = 0.2,
+        activation: str = "relu",
+    ) -> None:
         super().__init__()
+        activation_cls = _ACTIVATIONS[activation]
         layers: list[nn.Module] = []
         prev_dim = input_dim
         for hidden_dim in hidden_sizes:
             layers.append(nn.Linear(prev_dim, hidden_dim))
             layers.append(nn.BatchNorm1d(hidden_dim))
-            layers.append(nn.ReLU())
+            layers.append(activation_cls())
             layers.append(nn.Dropout(dropout))
             prev_dim = hidden_dim
         layers.append(nn.Linear(prev_dim, 1))
@@ -90,6 +100,7 @@ class WineScorePredictorNet:
         input_dim: int,
         hidden_sizes: list[int],
         dropout: float = 0.2,
+        activation: str = "relu",
         learning_rate: float = 1e-3,
         weight_decay: float = 0.0,
         batch_size: int = 128,
@@ -97,10 +108,12 @@ class WineScorePredictorNet:
         early_stopping_patience: int = 10,
         random_state: int = RANDOM_STATE,
         device: str | None = None,
+        grad_clip_norm: float | None = 1.0,
     ) -> None:
         self.input_dim = input_dim
         self.hidden_sizes = hidden_sizes
         self.dropout = dropout
+        self.activation = activation
         self.learning_rate = learning_rate
         self.weight_decay = weight_decay
         self.batch_size = batch_size
@@ -108,6 +121,7 @@ class WineScorePredictorNet:
         self.early_stopping_patience = early_stopping_patience
         self.random_state = random_state
         self.device = device
+        self.grad_clip_norm = grad_clip_norm
 
     def fit(
         self,
@@ -120,9 +134,14 @@ class WineScorePredictorNet:
     ) -> "WineScorePredictorNet":
         torch.manual_seed(self.random_state)
         device = self.device or detect_torch_device()
-        self.model_ = WineScoreNet(self.input_dim, self.hidden_sizes, self.dropout).to(device)
+        self.model_ = WineScoreNet(
+            self.input_dim, self.hidden_sizes, self.dropout, self.activation
+        ).to(device)
         optimizer = torch.optim.AdamW(
             self.model_.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay
+        )
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode="min", factor=0.5, patience=2, min_lr=1e-6
         )
         loss_fn = nn.MSELoss()
 
@@ -144,6 +163,7 @@ class WineScorePredictorNet:
 
         self.train_losses_: list[float] = []
         self.val_losses_: list[float] = []
+        self.lr_history_: list[float] = []
         self.best_epoch_ = 0
         best_val_loss = float("inf")
         best_state: dict[str, torch.Tensor] | None = None
@@ -158,6 +178,10 @@ class WineScorePredictorNet:
                 preds = self.model_(features)
                 loss = loss_fn(preds, target)
                 loss.backward()
+                if self.grad_clip_norm is not None:
+                    torch.nn.utils.clip_grad_norm_(
+                        self.model_.parameters(), max_norm=self.grad_clip_norm
+                    )
                 optimizer.step()
                 running_loss += loss.item() * features.size(0)
                 n_samples += features.size(0)
@@ -177,6 +201,8 @@ class WineScorePredictorNet:
                         n_val += features.size(0)
                 val_loss = running_val / n_val
             self.val_losses_.append(val_loss)
+            scheduler.step(val_loss)
+            self.lr_history_.append(optimizer.param_groups[0]["lr"])
 
             if callbacks:
                 for callback in callbacks:

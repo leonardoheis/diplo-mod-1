@@ -3,6 +3,7 @@
 import numpy as np
 import torch
 from scipy import sparse
+from torch import nn
 
 from diplo_mod_1.training.nn_model import SparseTabularDataset, WineScoreNet
 
@@ -18,6 +19,12 @@ def test_wine_score_net_handles_single_hidden_layer() -> None:
     net = WineScoreNet(input_dim=6, hidden_sizes=[4], dropout=0.0)
     out = net(torch.randn(3, 6))
     assert out.shape == (3,)
+
+
+def test_wine_score_net_uses_requested_activation() -> None:
+    net = WineScoreNet(input_dim=6, hidden_sizes=[4], dropout=0.0, activation="gelu")
+    assert any(isinstance(layer, nn.GELU) for layer in net.network)
+    assert not any(isinstance(layer, nn.ReLU) for layer in net.network)
 
 
 def test_dataset_len_matches_row_count() -> None:

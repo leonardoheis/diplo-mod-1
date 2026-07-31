@@ -21,6 +21,7 @@ class NNSearchSpace(BaseModel):
     learning_rate: tuple[float, float] = (1e-4, 1e-2)
     weight_decay: tuple[float, float] = (1e-6, 1e-2)
     batch_size: list[int] = [64, 128, 256]
+    activation: list[str] = ["relu"]
 
     @field_validator("dropout", "learning_rate", "weight_decay")
     @classmethod

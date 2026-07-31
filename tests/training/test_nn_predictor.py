@@ -68,6 +68,32 @@ def test_fit_drops_trailing_batch_of_size_one(regression_split) -> None:
     model.fit(X_train, y_train, X_val=X_val, y_val=y_val)  # must not raise
 
 
+def test_fit_without_grad_clipping_still_works(regression_split) -> None:
+    X_train, y_train, X_val, y_val = regression_split
+    kwargs = dict(_FAST_KWARGS)
+    kwargs["grad_clip_norm"] = None
+    model = WineScorePredictorNet(**kwargs)
+    model.fit(X_train, y_train, X_val=X_val, y_val=y_val)  # must not raise
+    assert len(model.train_losses_) >= 1
+
+
+def test_lr_scheduler_reduces_lr_on_plateau() -> None:
+    rng = np.random.default_rng(0)
+    X_train = rng.normal(size=(60, 5)).astype(np.float32)
+    y_train = rng.normal(size=60).astype(np.float32)  # unlearnable noise -> val loss plateaus
+    X_val = rng.normal(size=(20, 5)).astype(np.float32)
+    y_val = rng.normal(size=20).astype(np.float32)
+
+    kwargs = dict(_FAST_KWARGS)
+    kwargs["max_epochs"] = 20
+    kwargs["early_stopping_patience"] = 20
+    model = WineScorePredictorNet(**kwargs)
+    model.fit(X_train, y_train, X_val=X_val, y_val=y_val)
+
+    assert len(model.lr_history_) == len(model.train_losses_)
+    assert model.lr_history_[-1] < model.lr_history_[0]
+
+
 def test_fit_invokes_callback(regression_split) -> None:
     X_train, y_train, X_val, y_val = regression_split
     model = WineScorePredictorNet(**_FAST_KWARGS)
