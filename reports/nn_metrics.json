@@ -1,0 +1,40 @@
+{
+  "runs": [
+    {
+      "run_id": "nn_training-20260730T222845Z",
+      "tuning_config": "nn_training.json",
+      "model_filename": "nn_training-20260730T222845Z.pt",
+      "best_params": {
+        "architecture": "512_128_32",
+        "dropout": 0.15636968998990508,
+        "learning_rate": 0.0040215545266902904,
+        "weight_decay": 1.987021538542864e-6,
+        "batch_size": 64
+      },
+      "metrics": [
+        {
+          "model_type": "neural_net",
+          "split": "train",
+          "rmse": 1.398695945739746,
+          "mae": 1.0908699035644531,
+          "r2": 0.7879951596260071
+        },
+        {
+          "model_type": "neural_net",
+          "split": "val",
+          "rmse": 1.5917210578918457,
+          "mae": 1.2454355955123901,
+          "r2": 0.7263307571411133
+        },
+        {
+          "model_type": "neural_net",
+          "split": "test",
+          "rmse": 1.5949801206588745,
+          "mae": 1.2479698657989502,
+          "r2": 0.7253940105438232
+        }
+      ]
+    }
+  ],
+  "best_run_id": "nn_training-20260730T222845Z"
+}
