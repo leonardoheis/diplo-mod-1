@@ -178,3 +178,6 @@ desktop.ini
 
 #---- CodeGraph ----
 codegraph/
+
+# ---- superpowers subagent-driven-development scratch workspace ----
+.superpowers/

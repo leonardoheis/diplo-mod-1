@@ -1,0 +1,41 @@
+{
+  "runs": [
+    {
+      "run_id": "nn_tabular_ablation-20260731T202427Z",
+      "tuning_config": "nn_training_wide_v1.json",
+      "model_filename": "nn_tabular_ablation.pt",
+      "best_params": {
+        "architecture": "256_64",
+        "dropout": 0.2246844304357644,
+        "activation": "gelu",
+        "learning_rate": 0.025221951700214282,
+        "weight_decay": 0.001260466458564947,
+        "batch_size": 64
+      },
+      "metrics": [
+        {
+          "model_type": "neural_net",
+          "split": "train",
+          "rmse": 1.5286970138549805,
+          "mae": 1.179888367652893,
+          "r2": 0.7467543482780457
+        },
+        {
+          "model_type": "neural_net",
+          "split": "val",
+          "rmse": 1.8565452098846436,
+          "mae": 1.442830204963684,
+          "r2": 0.6276913285255432
+        },
+        {
+          "model_type": "neural_net",
+          "split": "test",
+          "rmse": 1.8694294691085815,
+          "mae": 1.4459279775619507,
+          "r2": 0.6227601766586304
+        }
+      ]
+    }
+  ],
+  "best_run_id": "nn_tabular_ablation-20260731T202427Z"
+}

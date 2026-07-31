@@ -96,7 +96,7 @@ This allows a direct comparison between a classical approach and a Deep Learning
 │       ├── domain/       # Value objects, metrics, WineScorePredictor protocol
 │       ├── preprocessing/# Cleaning, feature engineering, encoding, splitting
 │       ├── schemas/      # Pipeline/evaluation result schemas, evaluate_predictor
-│       └── training/     # XGBoostTuner, ModelRegistry, GPU auto-detection, shap compat shim
+│       └── training/     # XGBoostTuner, ModelRegistry, WineScorePredictorNet, NNTuner, NNModelRegistry, GPU auto-detection, shap compat shim
 ├── models/               # Trained models / checkpoints — versioned in git
 ├── reports/              # Final report, figures, and metrics JSON
 ├── .env.example          # Template for local secrets (copy to .env)
@@ -139,9 +139,10 @@ The contents of `data/` are not versioned — only `.gitkeep` files are committe
 
 The classical ML model (`notebooks/03-train-baseline-xgboost.ipynb`) tunes XGBoost with [Optuna](https://optuna.org/) (Bayesian TPE search, early-stopped against the validation split) via a reusable `XGBoostTuner` class (`src/diplo_mod_1/training/`).
 
-- **Search space** — `n_trials`, early-stopping patience, and every hyperparameter's bounds live in [`configs/xgboost_tuning.json`](configs/xgboost_tuning.json) (and sibling `configs/xgboost_tuning_*.json` variants), selectable via the `XGBOOST_TUNING_CONFIG` env var, editable without touching code.
-- **GPU acceleration** is automatic, not manual — `detect_device()` probes XGBoost's own CUDA capability directly (not `torch.cuda.is_available()`, since this project's torch build can be CPU-only independent of XGBoost's bundled CUDA runtime) and falls back to CPU. Works unmodified on both an NVIDIA/Windows machine and Apple Silicon/Mac (XGBoost has no MPS backend, so it's CPU there — still fast via the native arm64 wheel).
-- **Model checkpoints are versioned, not overwritten** — `ModelRegistry` (`src/diplo_mod_1/training/registry.py`) saves one `models/xgboost_<run_id>.joblib` per run and keeps `models/xgboost_best.joblib` pointing at whichever run has the lowest test RMSE on record. `reports/xgboost_metrics.json` accumulates every run's hyperparameters and metrics, so different search spaces and feature sets stay comparable side by side (notebook 03, Step 9).
+- **XGBoost search space** — `n_trials`, early-stopping patience, and every hyperparameter's bounds live in [`configs/xgboost_tuning.json`](configs/xgboost_tuning.json) (and sibling `configs/xgboost_tuning_*.json` variants), selectable via the `XGBOOST_TUNING_CONFIG` env var, editable without touching code.
+- **Neural Network (NN) hyperparameters** — network architecture, learning rate, dropout, batch size, and other training settings live in [`configs/nn_training.json`](configs/nn_training.json), selectable via the `NN_TRAINING_CONFIG` env var. Tuning is performed via `NNTuner` (`src/diplo_mod_1/training/`) using Optuna with early-stopping on the validation split.
+- **GPU acceleration** is automatic, not manual — `detect_xgboost_device()` probes XGBoost's own CUDA capability directly (not `torch.cuda.is_available()`, since this project's torch build can be CPU-only independent of XGBoost's bundled CUDA runtime) and falls back to CPU. `detect_torch_device()` probes PyTorch for CUDA, MPS (Apple Silicon), or CPU in priority order. Both work unmodified on NVIDIA/Windows and Apple Silicon/Mac (XGBoost has no MPS backend, so it's CPU there — still fast via the native arm64 wheel).
+- **Model checkpoints are versioned, not overwritten** — `ModelRegistry` (`src/diplo_mod_1/training/registry.py`) saves one `models/xgboost_<run_id>.joblib` per XGBoost run and keeps `models/xgboost_best.joblib` pointing at whichever run has the lowest test RMSE on record. `NNModelRegistry` similarly saves one `models/<run_id>.pt` per NN run (`run_id` is already derived from the config filename stem, e.g. `nn_training-<timestamp>.pt`) and maintains `models/nn_best.pt`. `reports/xgboost_metrics.json` and `reports/nn_metrics.json` accumulate every run's hyperparameters and metrics, so different search spaces and feature sets stay comparable side by side (notebooks 03 and 04).
 - **Explainability** — `shap.TreeExplainer` (notebook 03, Step 13) runs against the current overall-best model, loaded fresh from disk, with a top-feature summary plot and table.
 - **Experiment tracking** to [Weights & Biases](https://wandb.ai/) is opt-in and off by default, so routine `poe check` / `poe nbtest` runs never create a W&B run:
 
@@ -223,6 +224,6 @@ uv run python src/script.py
 - pandas, numpy, scikit-learn, matplotlib, seaborn, fg-data-profiling
 - XGBoost (classical ML model), tuned with Optuna (Bayesian hyperparameter search), GPU-accelerated via CUDA when available
 - SHAP (model explainability)
-- PyTorch (neural network, with Apple Silicon / MPS GPU support)
+- PyTorch (neural network, with CUDA / Apple Silicon MPS / CPU auto-detection)
 - Weights & Biases (optional experiment tracking), python-dotenv (local config via `.env`)
 - Jupyter / JupyterLab

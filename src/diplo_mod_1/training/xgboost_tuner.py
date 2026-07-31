@@ -1,7 +1,6 @@
 """XGBoostTuner — Optuna-based hyperparameter search for XGBRegressor."""
 
 from collections.abc import Callable
-from functools import lru_cache
 
 import numpy as np
 import optuna
@@ -10,31 +9,9 @@ from xgboost import XGBRegressor
 
 from diplo_mod_1.domain.predictor import FeatureMatrix
 from diplo_mod_1.training.config import XGBoostTuningConfig
+from diplo_mod_1.training.device import detect_xgboost_device
 
 OptunaTrialCallback = Callable[[optuna.Study, optuna.trial.FrozenTrial], None]
-
-
-@lru_cache(maxsize=1)
-def detect_device() -> str:
-    """CUDA if XGBoost can actually train on it here, else CPU.
-
-    XGBoost has no Apple Silicon/MPS backend (unlike the PyTorch NN in
-    notebook 04) — CUDA is the only GPU path. Probes XGBoost directly rather
-    than trusting ``torch.cuda.is_available()``: XGBoost bundles its own CUDA
-    runtime independent of torch's, so a CPU-only torch build (as this
-    project's resolves to) says nothing about whether XGBoost's CUDA works.
-    Cached — the throwaway fit only runs once per process.
-    """
-    try:
-        XGBRegressor(tree_method="hist", device="cuda", n_estimators=1).fit(
-            np.zeros((2, 1), dtype=np.float32), np.zeros(2, dtype=np.float32)
-        )
-        device = "cuda"
-    except Exception:
-        device = "cpu"
-
-    print(f"XGBoost device: {device}")
-    return device
 
 
 class XGBoostTuner:
@@ -63,7 +40,7 @@ class XGBoostTuner:
             random_state=self.config.random_state,
             n_jobs=-1,
             tree_method="hist",
-            device=detect_device(),
+            device=detect_xgboost_device(),
             eval_metric="rmse",
             early_stopping_rounds=self.config.early_stopping_rounds,
         )

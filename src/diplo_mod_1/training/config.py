@@ -59,7 +59,7 @@ class RunRecord(BaseModel):
     run_id: str
     tuning_config: str
     model_filename: str
-    best_params: dict[str, float]
+    best_params: dict[str, float | int | str]
     metrics: list[ModelMetrics]
 
 
