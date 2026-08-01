@@ -56,6 +56,7 @@ class NNModelRegistry:
                 "input_dim": model.input_dim,
                 "hidden_sizes": model.hidden_sizes,
                 "dropout": model.dropout,
+                "activation": model.activation,
             },
             models_dir / model_filename,
         )
