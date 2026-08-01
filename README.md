@@ -163,6 +163,27 @@ Hyperparameter tuning alone (≈10 separate Optuna searches, varying depth/regul
 
 SHAP analysis independently confirms this: the top features by mean absolute SHAP value are almost entirely TF-IDF text terms, not tabular columns — the review text is now the dominant signal for predicting `points`, not a marginal add-on.
 
+## Current best result (Neural Network)
+
+The NN trains on the same tabular + TF-IDF feature set as XGBoost's best run above (44 tabular + 2000 TF-IDF columns). Three rounds of iteration, each on `configs/nn_training*.json`:
+
+| | test RMSE | test R² |
+| --- | --- | --- |
+| Initial search (10 trials) | 1.595 | 0.725 |
+| Wider search + Optuna pruning (20 trials) | 1.479 | 0.764 |
+| **+ activation choice, gradient clipping, LR scheduler (30 trials, current `models/nn_best.pt`)** | **1.463** | **0.769** |
+
+The winning run used a `512_128_32` architecture, SiLU activation, and notably heavier regularization (dropout 0.44, weight_decay 0.0025) than earlier rounds. A tabular-only ablation (`notebooks/04b-nn-tabular-ablation.ipynb`, 44 columns, no TF-IDF) scored test R² 0.623 — confirming the TF-IDF block is worth keeping for the NN too, not just for XGBoost.
+
+## Head-to-head (notebook 05)
+
+| | test RMSE | test R² |
+| --- | --- | --- |
+| **XGBoost (tabular + TF-IDF)** | **1.445** | **0.775** |
+| Neural Network (tabular + TF-IDF) | 1.463 | 0.769 |
+
+XGBoost wins narrowly (~1.2% lower RMSE). See `notebooks/05-evaluation-comparison.ipynb` for the predicted-vs-actual plots, a fresh side-by-side SHAP comparison, and the full critical-analysis writeup (why XGBoost edges out the NN on this dataset, overfitting signs in both models, and what a next iteration would try).
+
 ## Quality and linting
 
 Configured tooling:

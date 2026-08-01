@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import torch
+
 from diplo_mod_1.domain.metrics import ModelMetrics
 from diplo_mod_1.schemas.evaluation import EvaluationResult
 from diplo_mod_1.training.config import TuningHistory
@@ -9,11 +11,17 @@ from diplo_mod_1.training.nn_model import WineScorePredictorNet
 from diplo_mod_1.training.nn_registry import NNModelRegistry
 
 
-def _fitted_model(seed: int) -> WineScorePredictorNet:
+def _fitted_model(seed: int, activation: str = "relu") -> WineScorePredictorNet:
     import numpy as np
 
     model = WineScorePredictorNet(
-        input_dim=3, hidden_sizes=[4], max_epochs=2, batch_size=4, device="cpu", random_state=seed
+        input_dim=3,
+        hidden_sizes=[4],
+        max_epochs=2,
+        batch_size=4,
+        device="cpu",
+        random_state=seed,
+        activation=activation,
     )
     X = np.random.default_rng(seed).normal(size=(8, 3)).astype(np.float32)
     y = np.random.default_rng(seed).normal(size=8).astype(np.float32)
@@ -78,6 +86,27 @@ def test_string_valued_best_params_round_trip(tmp_path: Path) -> None:
     assert reloaded.runs[0].best_params["architecture"] == "512_128_32"
     assert reloaded.runs[0].best_params["dropout"] == 0.2
     assert reloaded.runs[0].best_params["batch_size"] == 128
+
+
+def test_checkpoint_persists_activation(tmp_path: Path) -> None:
+    """WineScoreNet's activation (relu/gelu/silu) has no learnable params, so
+    load_state_dict succeeds even if the wrong one is reconstructed -- the
+    checkpoint must self-describe it or reloading silently uses the wrong
+    function (regression test for a real bug: nn_best.pt was trained with
+    'gelu' but reconstruction always defaulted to 'relu')."""
+    metrics_path = tmp_path / "metrics.json"
+    record, _ = NNModelRegistry.save_run(
+        tmp_path,
+        metrics_path,
+        _fitted_model(1, activation="gelu"),
+        "run-a",
+        "cfg.json",
+        {},
+        _result(1.5),
+    )
+
+    checkpoint = torch.load(tmp_path / record.model_filename, map_location="cpu")
+    assert checkpoint["activation"] == "gelu"
 
 
 def test_loading_pre_existing_incompatible_file_starts_fresh(tmp_path: Path) -> None:
