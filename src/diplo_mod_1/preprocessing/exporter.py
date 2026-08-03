@@ -75,8 +75,6 @@ class DatasetExporter:
     @staticmethod
     def write_manifest(
         path: Path,
-        xgb_dir: Path,
-        nn_dir: Path,
         split_path: Path,
         x_shapes: dict[str, tuple[int, ...]],
         nn_tab_shapes: dict[str, tuple[int, ...]],
