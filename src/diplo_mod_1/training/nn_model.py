@@ -15,6 +15,15 @@ from diplo_mod_1.training.device import detect_torch_device
 
 _ACTIVATIONS: dict[str, type[nn.Module]] = {"relu": nn.ReLU, "gelu": nn.GELU, "silu": nn.SiLU}
 
+# ReduceLROnPlateau settings — not exposed as WineScorePredictorNet params (unlike
+# every other hyperparameter here) since they're a training-loop safety net, not
+# something worth searching: halve the LR after 2 stagnant epochs (comfortably
+# inside early_stopping_patience's default margin), floor it so it never decays
+# to numerically pointless values.
+_LR_SCHEDULER_FACTOR = 0.5
+_LR_SCHEDULER_PATIENCE = 2
+_LR_SCHEDULER_MIN_LR = 1e-6
+
 
 class WineScoreNet(nn.Module):
     """Feed-forward MLP regressor: ``[Linear -> BatchNorm1d -> Activation -> Dropout]``
@@ -141,7 +150,11 @@ class WineScorePredictorNet:
             self.model_.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay
         )
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode="min", factor=0.5, patience=2, min_lr=1e-6
+            optimizer,
+            mode="min",
+            factor=_LR_SCHEDULER_FACTOR,
+            patience=_LR_SCHEDULER_PATIENCE,
+            min_lr=_LR_SCHEDULER_MIN_LR,
         )
         loss_fn = nn.MSELoss()
 

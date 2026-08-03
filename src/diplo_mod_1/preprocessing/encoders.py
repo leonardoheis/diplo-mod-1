@@ -38,8 +38,7 @@ def _assemble_matrix(
     freq_df: pd.DataFrame,
     ohe_arr: np.ndarray,
     ohe_names: list[str],
-    *,
-    taster_strictness: np.ndarray | None = None,
+    taster_strictness: np.ndarray,
 ) -> FeatureMatrix:
     blocks: list[np.ndarray] = []
     names: list[str] = []
@@ -66,11 +65,10 @@ def _assemble_matrix(
     continuous_idx.extend(range(cursor, cursor + block.shape[1]))
     cursor += block.shape[1]
 
-    if taster_strictness is not None:
-        blocks.append(taster_strictness.reshape(-1, 1).astype(np.float32))
-        names.append("taster_strictness")
-        continuous_idx.append(cursor)
-        cursor += 1
+    blocks.append(taster_strictness.reshape(-1, 1).astype(np.float32))
+    names.append("taster_strictness")
+    continuous_idx.append(cursor)
+    cursor += 1
 
     block = freq_df[FREQ_FEATURE_COLS].to_numpy(dtype=np.float32)
     blocks.append(block)
@@ -165,22 +163,15 @@ class TabularEncoder:
         self._fit_core(train_df, y_train)
         return self
 
-    def fit_transform(
-        self,
-        train_df: pd.DataFrame,
-        y_train: np.ndarray,
-        *,
-        include_strictness: bool = False,
-    ) -> FeatureMatrix:
+    def fit_transform(self, train_df: pd.DataFrame, y_train: np.ndarray) -> FeatureMatrix:
         """Fit and return CV-encoded feature matrix for the training split."""
         train_target_df = self._fit_core(train_df, y_train)
         freq_df = self._encode_freq(train_df)
         ohe_arr, ohe_names = self._encode_ohe(train_df)
-        taster_strictness = None
-        if include_strictness and self.global_points_mean_ is not None:
-            taster_strictness = (
-                train_target_df["taster_avg_points"].to_numpy() - self.global_points_mean_
-            )
+        assert self.global_points_mean_ is not None  # set by _fit_core above
+        taster_strictness = (
+            train_target_df["taster_avg_points"].to_numpy() - self.global_points_mean_
+        )
         return _assemble_matrix(
             train_df,
             train_target_df,
@@ -190,21 +181,15 @@ class TabularEncoder:
             taster_strictness=taster_strictness,
         )
 
-    def transform(
-        self,
-        df: pd.DataFrame,
-        *,
-        include_strictness: bool = False,
-    ) -> FeatureMatrix:
+    def transform(self, df: pd.DataFrame) -> FeatureMatrix:
         """Apply fitted encoders to any split (val, test, or non-CV train)."""
         if not self.target_encoders_:
             raise RuntimeError("Call fit() or fit_transform() before transform().")
+        assert self.global_points_mean_ is not None  # set together with target_encoders_
         target_df = self._encode_target(df)
         freq_df = self._encode_freq(df)
         ohe_arr, ohe_names = self._encode_ohe(df)
-        taster_strictness = None
-        if include_strictness and self.global_points_mean_ is not None:
-            taster_strictness = target_df["taster_avg_points"].to_numpy() - self.global_points_mean_
+        taster_strictness = target_df["taster_avg_points"].to_numpy() - self.global_points_mean_
         return _assemble_matrix(
             df,
             target_df,

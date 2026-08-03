@@ -76,3 +76,17 @@ uv run jupyter nbconvert --to notebook --execute notebooks/*.ipynb
 - `gitleaks` pre-commit hook will block commits containing secrets/API keys. Never hardcode credentials.
 - API keys (e.g. `WANDB_API_KEY`) go in `.env` (gitignored, loaded via `python-dotenv`), never inline. Copy `.env.example` to `.env` and fill in your own values.
 - When adding a new dependency: `uv add <package>` (updates both `pyproject.toml` and `uv.lock`).
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues (github.com/leonardoheis/diplo-mod-1), via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five canonical roles (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout (`CONTEXT.md` + `docs/adr/` at the repo root, created lazily as concepts/decisions get resolved). See `docs/agents/domain.md`.
