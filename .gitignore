@@ -124,6 +124,9 @@ data/**
 !data/**/
 !data/**/.gitkeep
 *.csv
+# Exported best-run summary (config + metrics + W&B URL) — versioned so
+# results are visible in the repo without needing W&B access.
+!reports/wandb_best_results.csv
 *.tsv
 *.parquet
 *.feather

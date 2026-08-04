@@ -138,8 +138,6 @@ def test_write_manifest_produces_valid_json(tmp_path: Path, encoder_artifacts: d
     manifest_path = tmp_path / "dataset_manifest.json"
     DatasetExporter.write_manifest(
         manifest_path,
-        tmp_path / "xgboost",
-        tmp_path / "nn",
         tmp_path / "split_indices.npz",
         {k: v.shape for k, v in ea["x_tab"].items()},
         {k: v.shape for k, v in ea["x_tab"].items()},

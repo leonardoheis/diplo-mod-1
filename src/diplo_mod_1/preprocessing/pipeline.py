@@ -175,8 +175,6 @@ class PreprocessingPipeline:
 
         self.exporter.write_manifest(
             processed_dir / "dataset_manifest.json",
-            xgb.out_dir,
-            nn.out_dir,
             processed_dir / "split_indices.npz",
             {k: xgb.X_splits[k].shape for k in xgb.X_splits},
             {k: nn.X_tab_splits[k].shape for k in nn.X_tab_splits},
