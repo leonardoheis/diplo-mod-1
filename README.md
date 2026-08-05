@@ -184,6 +184,22 @@ The winning run used a `512_128_32` architecture, SiLU activation, and notably h
 
 XGBoost wins narrowly (~1.2% lower RMSE). See `notebooks/05-evaluation-comparison.ipynb` for the predicted-vs-actual plots, a fresh side-by-side SHAP comparison, and the full critical-analysis writeup (why XGBoost edges out the NN on this dataset, overfitting signs in both models, and what a next iteration would try).
 
+## Shareable results report (notebook 06)
+
+Notebook 06's final step (`WANDB_ENABLED=true`) pulls the best-recorded run per model plus the head-to-head comparison run from W&B and writes three self-contained artifacts to `reports/` — no W&B account needed to view any of them:
+
+| File | What it is |
+| --- | --- |
+| `wandb_best_results.csv` | Best run's config + final metrics per model, flat table |
+| `wandb_best_results.html` | Interactive slide deck (dark theme, horizontal scroll-snap navigation, keyboard/dot/arrow controls) — for on-screen presentation |
+| `wandb_report.html` / `wandb_report.pdf` | Document-style report (light theme, single scrollable column, clickable table of contents) — for reading, printing, or sharing as a PDF |
+
+Both HTML reports are written in Spanish and organized around the assignment's own report sections (3.1 Introducción through 3.6 Conclusiones): the dataset and problem type, EDA findings, preprocessing choices, both models' tuned hyperparameters and training curves, the head-to-head evaluation (metrics table, comparison charts, SHAP feature importance), a synthetic wine-prediction example, and lessons learned. They share the same underlying content — the deck lays it out one idea per slide for presenting, the document report reuses the exact same sections inline for scrolling/printing.
+
+The interactive deck auto-publishes to GitHub Pages on every push to `main` that touches `reports/wandb_best_results.html`, via [`.github/workflows/deploy-pages.yaml`](.github/workflows/deploy-pages.yaml): **https://leonardoheis.github.io/diplo-mod-1/**
+
+`wandb_report.pdf` is generated locally from `wandb_report.html` via headless Chrome (`chrome --headless=new --print-to-pdf=...`) — it isn't part of the automated pipeline, so regenerate it manually after re-running notebook 06.
+
 ## Quality and linting
 
 Configured tooling:
