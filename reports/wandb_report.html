@@ -72,6 +72,11 @@
       .card, img, .toc { page-break-inside: avoid; break-inside: avoid; }
       .card { overflow-x: visible; }
       a { text-decoration: underline; }
+      /* Bigger group-authorship line on the title page, print only --
+         no per-page footer (position:fixed overlapped mid-document
+         content since body padding only reserves space at the very
+         start/end of the flow, not on every physical page). */
+      .group-line { font-size: 1.4rem; margin-top: .75rem; }
     }
 </style>
 </head>
@@ -83,7 +88,7 @@
 <a href="https://github.com/leonardoheis/diplo-mod-1">github.com/leonardoheis/diplo-mod-1</a>
 <a href="https://leonardoheis.github.io/diplo-mod-1/">leonardoheis.github.io/diplo-mod-1</a>
 </p>
-<p><strong>Grupo 1:</strong> Leonardo Heis, Leandro Juarez, Maximiliano Miro.
+<p class="group-line"><strong>Grupo 1:</strong> Leonardo Heis, Leandro Juarez, Maximiliano Miro.
 </p>
 <nav class="toc">
 <p class="toc-title">Contenido</p>
